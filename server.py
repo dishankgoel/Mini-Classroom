@@ -1,6 +1,7 @@
 import socket
 from threading import Thread
-from http_lib import HttpParser
+from http_lib import HttpParser, HttpResponse
+from server_to_app import Handler
 
 class RequestThread(Thread):
 
@@ -16,6 +17,16 @@ class RequestThread(Thread):
 
         http_object = HttpParser(self.sock, self.buffer_size)
         http_object.parse()
+
+        import app
+        handle_request = Handler(http_object)
+        status_code, headers, body = handle_request.handle(app.app)
+
+        http_response = HttpResponse(self.sock)
+        http_response.respond(status_code, headers, body)
+        # app = Interface(http_object)
+        # app.handle()
+        
         # print("Request method: ", http_object.get_method())
         # print("Request uri: ", http_object.get_uri())
         # print("Request version: ", http_object.get_version())
