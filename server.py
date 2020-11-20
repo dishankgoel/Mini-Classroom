@@ -24,6 +24,7 @@ class RequestThread(Thread):
 
         http_response = HttpResponse(self.sock)
         http_response.respond(status_code, headers, body)
+        self.sock.close()
         # app = Interface(http_object)
         # app.handle()
         

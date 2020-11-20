@@ -33,15 +33,17 @@ class Tag:
         self.tagName = tagName
         self.classID = classID
 
-class Classroom_user_role_map:
+class Classroom_user_role:
     def __init__(self, classID, userID, role):
         self.classID = classID
         self.userID = userID
         self.role = role
 
-class Tag_post_map:
-    def __init__(self, postID, tagID):
-        self.postID = postID
-        self.tagID = tagID
+# Can be Implemented using JOIN in sql
+#  
+# class Tag_post_map:
+#     def __init__(self, postID, tagID):
+#         self.postID = postID
+#         self.tagID = tagID
         
         

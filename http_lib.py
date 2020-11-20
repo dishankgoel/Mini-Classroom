@@ -212,7 +212,7 @@ class HttpResponse():
 
         self.sock = sock
         
-        self.body = ""
+        self.body = b""
         self.headers = ""
         self.first_line = ""
 
@@ -222,7 +222,7 @@ class HttpResponse():
     def prepare_headers_and_body(self, headers, body):
 
         self.body = body
-        headers["Content-Length"] = len(bytes(body, "utf-8"))
+        headers["Content-Length"] = len(body)
         for header in headers:
             val = headers[header]
             self.headers += "{}: {}\r\n".format(header, val)
@@ -233,6 +233,6 @@ class HttpResponse():
         self.prepare_first_line(status_code)
         self.prepare_headers_and_body(headers, body)
 
-        response = bytes(self.first_line + self.headers + "\r\n" + self.body, "utf-8")
+        response = bytes(self.first_line + self.headers + "\r\n", "utf-8") + self.body
 
         self.sock.sendall(response)
