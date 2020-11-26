@@ -52,18 +52,25 @@ class Handler():
                 status_code = 200
                 return status_code, headers, body
             except:
-                return not_found()
+                return error(404)
         else:
             app.set_request_data(self.headers, self.query_string, self.form_data, self.method)
             return app.routes[self.path]()
 
+error_reasons = {
+    404: "The requested file was not found on this server",
+}
     
-def not_found():
+def error(error_code, reason = None):
     headers = {"Server": server_name, "Content-Type": "text/html", "Connection": "close"}
-    status_code = 404
-    with open("static/404.html", "rb") as f:
-        body = f.read()
-    return status_code, headers, body
+    status_code = error_code
+    template = env.get_template("error.html")
+    if reason is not None:
+        body = template.render(error_code = error_code, reason = reason)
+    else:
+        body = template.render(error_code = error_code, reason = error_reasons[error_code])
+        
+    return status_code, headers, bytes(body, "utf-8")
 
 def find_content_type(path_of_file):
 
@@ -79,12 +86,19 @@ def find_content_type(path_of_file):
     return content_type
 
 def redirect(new_route):
-
-    pass
+    status_code = 302
+    headers = {"Location": new_route}
+    return status_code, headers, b""
 
 def render_html(html_page, **kwargs):
-    template = env.get_template(html_page)
-    body = template.render()
-    headers = {"Server": server_name, "Content-Type": "text/html", "Connection": "close"}
     status_code = 200
+    template = env.get_template(html_page)
+    body = template.render(**kwargs)
+    headers = {"Server": server_name, "Content-Type": "text/html", "Connection": "close"}
+    return status_code, headers, bytes(body, "utf-8")
+
+def return_auth_token(token):
+    status_code = 200
+    headers = {"Server": server_name, "Connection": "close", "Set-Cookie":"access_token={}".format(token)}
+    body = ""
     return status_code, headers, bytes(body, "utf-8")

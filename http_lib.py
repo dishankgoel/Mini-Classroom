@@ -222,7 +222,8 @@ class HttpResponse():
     def prepare_headers_and_body(self, headers, body):
 
         self.body = body
-        headers["Content-Length"] = len(body)
+        if len(body) != 0:
+            headers["Content-Length"] = len(body)
         for header in headers:
             val = headers[header]
             self.headers += "{}: {}\r\n".format(header, val)
