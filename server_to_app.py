@@ -44,12 +44,12 @@ class Handler():
     def handle(self, app):
 
         if "/classrooms/" in self.path:
-            try:
-                class_id = int(self.path.split("/")[-1])
-                app.set_request_data(self.headers, self.query_string, self.form_data, self.method)
-                return app.routes["access_classroom"](class_id)
-            except:
-                return error(404)
+            # try:
+            class_id = int(self.path.split("/")[-1])
+            app.set_request_data(self.headers, self.query_string, self.form_data, self.method)
+            return app.routes["access_classroom"](class_id)
+            # except:
+            # return error(404)
 
         if self.path not in app.routes:
             try:

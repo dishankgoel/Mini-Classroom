@@ -1,0 +1,15 @@
+<html>
+    <body>
+        <p style="text-align:right;">{{username}}</p>
+        <h1>Classroom name: {{details["name"]}}</h1>
+        <h2>Created by: {{details["creator_name"]}}</h2>
+        <p>{{details["description"]}}</p>
+        {% for post in posts %}
+            <h3> {{post["timestamp"]}} </h3>
+            <h3> {{post["creator_userID"]}} </h3>
+            <p> {{post["content"]}} </p>
+            <hr>
+        {% endfor %}
+    </body>
+</html>
+
