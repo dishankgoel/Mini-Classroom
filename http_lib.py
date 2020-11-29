@@ -1,3 +1,5 @@
+from urllib.parse import unquote
+
 def bytetostr(string):
     return string.decode("utf-8")
 
@@ -114,6 +116,8 @@ class HttpParser():
             queries = elements[1].split("&")
             for query in queries:
                 field, val = query.split("=")
+                field = unquote(field).replace("+", " ")
+                val = unquote(val).replace("+", " ")
                 self.query_string[field] = val
 
     def parse_form_data(self):
@@ -123,6 +127,8 @@ class HttpParser():
         form = self.body.split("&")
         for data in form:
             field, val = data.split("=")
+            field = unquote(field).replace("+", " ")
+            val = unquote(val).replace("+", " ")
             self.form_data[field] = val
 
     def parse(self):

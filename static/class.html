@@ -7,7 +7,7 @@
         {% for post in posts %}
             <h3> {{post["timestamp"]}} </h3>
             <h3> {{post["creator_userID"]}} </h3>
-            <p> {{post["content"]}} </p>
+            <p> {{post.content}} </p>
             <hr>
         {% endfor %}
     </body>

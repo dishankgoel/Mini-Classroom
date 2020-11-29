@@ -38,7 +38,7 @@
     {% if classrooms %}
       {% for class in classrooms %}
         <div class="card">
-          {% if class.creatorid|int() == userid %}
+          {% if class.creatorid|int() == class.userid|int() %}
             <div class="card-header">
               Joining code: {{class.code}}
             </div>

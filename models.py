@@ -16,11 +16,11 @@ class Classroom:
         sql = '''INSERT INTO Classrooms (creator_userID, name, description) VALUES (%s, %s, %s)'''
         val = (self.creator_userID, self.name, self.description)
         db_cursor.execute(sql, val)
-        db_cursor.commit()
+        sql_database.commit()
         self.classID = db_cursor.lastrowid
         code = joining_code_from_id(self.classID)
         db_cursor.execute('''UPDATE Classrooms SET code = %s WHERE classID = %s''', (code, self.classID))
-        db_cursor.commit()
+        sql_database.commit()
         db_cursor.close()
     
     def get_id_from_code(self, sql_database):
@@ -145,7 +145,7 @@ class Classroom_user_role:
         sql = '''INSERT INTO ClassUserRole (classID, userID, role)  VALUES (%s, %s, %s)'''
         val = (self.classID, self.userID, self.role)
         db_cursor.execute(sql, val)
-        db_cursor.commit()
+        sql_database.commit()
         db_cursor.close()
 
 # Can be Implemented using JOIN in sql

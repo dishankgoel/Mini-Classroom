@@ -7,7 +7,7 @@ ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';
 conn = mysql.connector.connect(
     host = "localhost",
     user = "root",
-    password = "Proj@Py19"
+    password = "root"
 )
 
 dbcursor = conn.cursor()
