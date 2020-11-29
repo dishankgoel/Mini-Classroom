@@ -1,9 +1,36 @@
+import hashlib
+
+def joining_code_from_id(classID):
+    return hashlib.md5(bytes(str(classID), "utf-8")).hexdigest()[:8]
 class Classroom:
-    def __init__(self, classID, creator_userID, name, description):
+    def __init__(self, classID=None, creator_userID=None, name=None, description=None, joining_code = None):
         self.classID = classID
         self.creator_userID = creator_userID
         self.name = name
         self.description = description
+        self.joining_code = joining_code
+
+    def add_class(self, sql_database):
+        
+        db_cursor = sql_database.cursor()
+        sql = '''INSERT INTO Classrooms (creator_userID, name, description) VALUES (%s, %s, %s)'''
+        val = (self.creator_userID, self.name, self.description)
+        db_cursor.execute(sql, val)
+        db_cursor.commit()
+        self.classID = db_cursor.lastrowid
+        code = joining_code_from_id(self.classID)
+        db_cursor.execute('''UPDATE Classrooms SET code = %s WHERE classID = %s''', (code, self.classID))
+        db_cursor.commit()
+        db_cursor.close()
+    
+    def get_id_from_code(self, sql_database):
+
+        db_cursor = sql_database.cursor()
+        sql = '''SELECT classID FROM Classrooms WHERE code = %s'''
+        db_cursor.execute(sql, (self.joining_code,))
+        results = db_cursor.fetchall()
+        # assert(len(results) == 1)
+        return int(results[0][0])
 
 class Post:
     def __init__(self, postID, classID, timestamp, creator_userID, content):
@@ -70,7 +97,8 @@ class User:
         results = db_cursor.fetchall()
         joined_classrooms = []
         for result in results:
-            joined_classrooms.append(Classroom(classID=int(result[0]), creator_userID=int(result[1]), name=result[2], description=result[3]))
+            joining_code = joining_code_from_id(int(result[0])) 
+            joined_classrooms.append(Classroom(classID=int(result[0]), creator_userID=int(result[1]), name=result[2], description=result[3], joining_code=joining_code))
         db_cursor.close()
         return joined_classrooms
 
@@ -95,6 +123,15 @@ class Classroom_user_role:
         self.classID = classID
         self.userID = userID
         self.role = role
+    
+    def add_role(self, sql_database):
+
+        db_cursor = sql_database.cursor()
+        sql = '''INSERT INTO ClassUserRole (classID, userID, role)  VALUES (%s, %s, %s)'''
+        val = (self.classID, self.userID, self.role)
+        db_cursor.execute(sql, val)
+        db_cursor.commit()
+        db_cursor.close()
 
 # Can be Implemented using JOIN in sql
 #  

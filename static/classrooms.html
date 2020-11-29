@@ -38,11 +38,16 @@
     {% if classrooms %}
       {% for class in classrooms %}
         <div class="card">
+          {% if class.creatorid|int() == userid %}
+            <div class="card-header">
+              Joining code: {{class.code}}
+            </div>
+          {% endif %}
           <!-- <img class="card-img-top" src="..." alt="Card image cap"> -->
           <div class="card-body">
             <h5 class="card-title">{{class.name}}</h5>
             <p class="card-text">{{class.description}}</p>
-            <a href="{{class.link}}" class="btn btn-primary stretched-link">Go to Class</a>
+            <a href="/classrooms/{{class.classid}}" class="btn btn-primary stretched-link">Go to Class</a>
             <!-- <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
           </div>
         </div>

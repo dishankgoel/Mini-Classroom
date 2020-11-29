@@ -20,7 +20,8 @@ make_classrooms = '''CREATE TABLE Classrooms (
     classID INT AUTO_INCREMENT PRIMARY KEY, 
     creator_userID INT,
     name VARCHAR(100),
-    description TEXT
+    description TEXT,
+    code VARCHAR(100) UNIQUE
 )'''
 
 make_posts = '''CREATE TABLE Posts (

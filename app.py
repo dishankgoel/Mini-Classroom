@@ -2,7 +2,7 @@ import os
 import mysql.connector
 import jwt
 from server_to_app import Interface, redirect, render_html, error
-from models import User
+from models import *
 
 app = Interface()
 
@@ -66,21 +66,21 @@ def login():
 app.route("/login", login)
 
 def classrooms():
-    code, user = validate_login(app.headers)
-    if(code == 0):
+    ret_code, user = validate_login(app.headers)
+    if(ret_code == 0):
         return user
     else:
         joined_classes = user.list_classrooms(sql_database)
         classroom_data = []
         for joined_class in joined_classes:
-            classroom_data.append({"name": joined_class.name, "description": joined_class.description, "link": "/classrooms/{}".format(joined_class.classID)})
+            classroom_data.append({"name": joined_class.name, "description": joined_class.description, "classid": joined_class.classID, "code": joined_class.joining_code, "userid": user.userID, "creatorid": joined_class.creator_userID})
         return render_html("classrooms.html", classrooms = classroom_data)
 app.route("/classrooms", classrooms)
 
 
 def access_classroom(class_id):
-    code, user = validate_login(app.headers)
-    if(code == 0):
+    ret_code, user = validate_login(app.headers)
+    if(ret_code == 0):
         return user
     else:
         joined_classes = user.list_classrooms(sql_database)
@@ -93,15 +93,30 @@ app.route("access_classroom", access_classroom)
 def create_classroom():
     if app.method == "GET":
         return render_html("create_class.html")
-    form_data = app.form_data
-
-    pass
-
+    ret_code, user = validate_login(app.headers)
+    if(ret_code == 0):
+        return user
+    else:
+        form_data = app.form_data
+        name, description = form_data['name'], form_data['description']
+        new_class = Classroom(creator_userID=user.userID, name=name, description=description)
+        new_class.add_class(sql_database)
+        new_classroom_user_role = Classroom_user_role(classID=new_class.classID, userID=user.userID, role=0)
+        new_classroom_user_role.add_role(sql_database)
+        return redirect("/classrooms")
 app.route("/CreateClass", create_classroom)
 
 def join_classroom():
     if app.method == "GET":
-        return render_html("join_class,html")
-    form_data = app.form_data
-    pass
+        return render_html("join_class.html")
+    ret_code, user = validate_login(app.headers)
+    if(ret_code == 0):
+        return user
+    else:
+        joining_code = app.form_data['code']
+        find_class = Classroom(joining_code=joining_code)
+        classID = find_class.get_id_from_code(sql_database)
+        user_role = Classroom_user_role(classID=classID, userID=user.userID, role=1)
+        user_role.add_role(sql_database)
+        return redirect("/classrooms")
 app.route("/JoinClass", join_classroom)
