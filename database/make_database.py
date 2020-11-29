@@ -19,7 +19,8 @@ dbcursor.execute("use MiniClassroom")
 make_classrooms = '''CREATE TABLE Classrooms (
     classID INT AUTO_INCREMENT PRIMARY KEY, 
     creator_userID INT,
-    name VARCHAR(100)
+    name VARCHAR(100),
+    description TEXT
 )'''
 
 make_posts = '''CREATE TABLE Posts (

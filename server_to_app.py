@@ -43,6 +43,14 @@ class Handler():
 
     def handle(self, app):
 
+        if "/classrooms/" in self.path:
+            try:
+                class_id = int(self.path.split("/")[-1])
+                app.set_request_data(self.headers, self.query_string, self.form_data, self.method)
+                return app.routes["access_classroom"](class_id)
+            except:
+                return error(404)
+
         if self.path not in app.routes:
             try:
                 with open(os.getcwd() + self.path, "rb") as f:
@@ -59,6 +67,7 @@ class Handler():
 
 error_reasons = {
     404: "The requested file was not found on this server",
+    405: "This method is not allowed"
 }
     
 def error(error_code, reason = None):
@@ -85,9 +94,11 @@ def find_content_type(path_of_file):
         content_type = "image/jpeg"
     return content_type
 
-def redirect(new_route):
+def redirect(new_route, token = None):
     status_code = 302
     headers = {"Location": new_route}
+    if token is not None:
+        headers = {**headers, "Set-Cookie":"access_token={}".format(token)}
     return status_code, headers, b""
 
 def render_html(html_page, **kwargs):
@@ -95,10 +106,4 @@ def render_html(html_page, **kwargs):
     template = env.get_template(html_page)
     body = template.render(**kwargs)
     headers = {"Server": server_name, "Content-Type": "text/html", "Connection": "close"}
-    return status_code, headers, bytes(body, "utf-8")
-
-def return_auth_token(token):
-    status_code = 200
-    headers = {"Server": server_name, "Connection": "close", "Set-Cookie":"access_token={}".format(token)}
-    body = ""
     return status_code, headers, bytes(body, "utf-8")

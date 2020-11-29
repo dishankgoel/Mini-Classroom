@@ -118,7 +118,7 @@ class HttpParser():
 
     def parse_form_data(self):
         '''Parse the body for POST form data'''
-        if(self.body == ""):
+        if(self.body == "" or self.body == b""):
             return
         form = self.body.split("&")
         for data in form:
