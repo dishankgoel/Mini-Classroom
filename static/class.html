@@ -1,9 +1,23 @@
 <html>
     <body>
-        <p style="text-align:right;">{{username}}</p>
+        <p style="text-align:right;">{{user_details["username"]}}</p>
         <h1>Classroom name: {{details["name"]}}</h1>
         <h2>Created by: {{details["creator_name"]}}</h2>
         <p>{{details["description"]}}</p>
+        <hr>
+        {% if details["creator_userID"]|int() == user_details["userID"]|int() %}
+            <form action="/classrooms/{{details.classID}}" method="POST">
+                <div class="form-group">
+                    <label for="content">Content:</label>
+                    <input type="text" class="form-control" id="content" placeholder="Enter content" name="content">
+                </div>
+                <div class="form-group">
+                    <label for="tag">Tag:</label>
+                    <input type="text" class="form-control" id="tag" placeholder="Enter tag" name="tag">
+                </div>
+                <button type="submit" class="btn btn-primary">Post</button>
+            </form>
+        {% endif %}
         {% for post in posts %}
             <h3> {{post["timestamp"]}} </h3>
             <h3> {{post["creator_userID"]}} </h3>

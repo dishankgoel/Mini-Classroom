@@ -16,11 +16,11 @@ class Classroom:
         sql = '''INSERT INTO Classrooms (creator_userID, name, description) VALUES (%s, %s, %s)'''
         val = (self.creator_userID, self.name, self.description)
         db_cursor.execute(sql, val)
-        db_cursor.commit()
+        sql_database.commit()
         self.classID = db_cursor.lastrowid
         code = joining_code_from_id(self.classID)
         db_cursor.execute('''UPDATE Classrooms SET code = %s WHERE classID = %s''', (code, self.classID))
-        db_cursor.commit()
+        sql_database.commit()
         db_cursor.close()
     
     def get_id_from_code(self, sql_database):
@@ -47,12 +47,20 @@ class Classroom:
         return creator_name
 
 class Post:
-    def __init__(self, postID, classID, timestamp, creator_userID, content):
+    def __init__(self, postID=None, classID=None, timestamp=None, creator_userID=None, content=None):
         self.postID = postID
         self.classID = classID
         self.timestamp = timestamp
         self.creator_userID = creator_userID
         self.content = content
+
+    def add_post(self, sql_database):
+        db_cursor = sql_database.cursor()
+        sql = "INSERT INTO Posts (classID, creator_userID, content) VALUES (%s, %s, %s)"
+        val = (self.classID, self.creator_userID, self.content)
+        db_cursor.execute(sql, val)
+        sql_database.commit()
+        # look into tagID classID postID relation before going ahead
 
 class User:
     def __init__(self, emailID = None, password = None, name = None, userID = None):
@@ -128,10 +136,10 @@ class Comment:
         self.content = content
 
 class Tag:
-    def __init__(self, tagID, tagName, classID):
+    def __init__(self, tagID, tagName, postID):
         self.tagID = tagID
         self.tagName = tagName
-        self.classID = classID
+        self.postID = postID
 
 class Classroom_user_role:
     def __init__(self, classID, userID, role):
@@ -145,7 +153,7 @@ class Classroom_user_role:
         sql = '''INSERT INTO ClassUserRole (classID, userID, role)  VALUES (%s, %s, %s)'''
         val = (self.classID, self.userID, self.role)
         db_cursor.execute(sql, val)
-        db_cursor.commit()
+        sql_database.commit()
         db_cursor.close()
 
 # Can be Implemented using JOIN in sql
