@@ -32,6 +32,20 @@ class Classroom:
         # assert(len(results) == 1)
         return int(results[0][0])
 
+    def list_posts(self, sql_database):
+        sql = "SELECT * from Posts WHERE CLASSID=%s"
+        db_cursor = sql_database.cursor()
+        db_cursor.execute(sql, (self.classID,))
+        posts = db_cursor.fetchall()        
+        return posts
+
+    def get_creator_name(self, sql_database):
+        db_cursor = sql_database.cursor()
+        creator_name_sql = "SELECT name from Users WHERE userID=%s"
+        db_cursor.execute(creator_name_sql, (self.creator_userID,))
+        creator_name = db_cursor.fetchall()
+        return creator_name
+
 class Post:
     def __init__(self, postID, classID, timestamp, creator_userID, content):
         self.postID = postID
@@ -54,14 +68,15 @@ class User:
         db_cursor.execute('''SELECT emailID from Users''')
         results = db_cursor.fetchall()
         if (self.emailID,) in results:
-            return 0
+            return -1
         # Insert the user
         sql = "INSERT INTO Users (emailID, password, name) VALUES (%s, MD5(%s), %s)"
         val = (self.emailID, self.password, self.name)
         db_cursor.execute(sql, val)
         sql_database.commit()
+        user_id = db_cursor.lastrowid
         db_cursor.close()
-        return 1
+        return user_id
 
     def login_user(self, sql_database):
 

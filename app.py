@@ -8,9 +8,9 @@ app = Interface()
 
 app_secret = '^gr05fr78^&tr3vr'
 
-DB_HOST = os.getenv("DB_HOST")
-DB_USER = os.getenv("DB_USER")
-DB_PASS = os.getenv("DB_PASS")
+DB_HOST = "localhost"
+DB_USER = "root"
+DB_PASS = "Proj@Py19"
 
 sql_database = mysql.connector.connect(
     host = DB_HOST,
@@ -43,10 +43,11 @@ def signup():
         form_data = app.form_data
         name, email, passwd  = form_data["name"], form_data["email"], form_data["pwd"]
         new_user = User(emailID=email, password=passwd, name=name)
-        if_inserted = new_user.add_user(sql_database)
-        if(if_inserted == 0):
+        user_id = new_user.add_user(sql_database)
+        if(user_id == -1):
             return error(200, "The User Already exists. Please try another Email ID.")        
-        return render_html("index.html")
+        jwt_token = jwt.encode({'emailID': email, 'userID': user_id, 'name': name}, app_secret, algorithm='HS256')
+        return redirect(new_route="/classrooms", token=jwt_token.decode("utf-8"))
 app.route("/signup", signup)
 
 def login():
@@ -87,7 +88,22 @@ def access_classroom(class_id):
         class_ids = [joined_class.classID for joined_class in joined_classes]
         if class_id not in class_ids:
             return error(200, "You are not a part of this classroom")
-        return render_html("lol")
+        classroom_obj = Classroom(classID=class_id)
+        for joined_class in joined_classes:
+            if joined_class.classID == class_id:
+                classroom_obj = joined_class
+                break
+        posts = classroom_obj.list_posts(sql_database=sql_database)
+        classroom_details = {}
+        classroom_details["creator_name"] = classroom_obj.get_creator_name(sql_database=sql_database)[0][0]
+        classroom_details["name"] = classroom_obj.name
+        classroom_details["description"] = classroom_obj.description
+        # print(classroom_details["creator_name"])
+        post_list = []
+        for post in posts:
+            post_list.append({"postID":post[0], "classID":post[1], "timestamp":post[2], "creator_userID":post[3], "content":post[4]})
+        username = user.name
+        return render_html("class.html", posts=post_list, details=classroom_details, username = username)
 app.route("access_classroom", access_classroom)
 
 def create_classroom():
