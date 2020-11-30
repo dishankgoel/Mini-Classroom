@@ -50,7 +50,7 @@ make_comments = '''CREATE TABLE Comments (
 make_tags = '''CREATE TABLE PostTags (
     tagID INT AUTO_INCREMENT PRIMARY KEY,
     tagName VARCHAR(100),
-    classID INT
+    postID INT
 )'''
 
 make_classroom_user_role = '''CREATE TABLE ClassUserRole (

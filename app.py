@@ -8,9 +8,9 @@ app = Interface()
 
 app_secret = '^gr05fr78^&tr3vr'
 
-DB_HOST = os.getenv("DB_HOST")
-DB_USER = os.getenv("DB_USER")
-DB_PASS = os.getenv("DB_PASS")
+DB_HOST = "localhost"
+DB_USER = "root"
+DB_PASS = "Proj@Py19"
 
 sql_database = mysql.connector.connect(
     host = DB_HOST,
@@ -93,17 +93,26 @@ def access_classroom(class_id):
             if joined_class.classID == class_id:
                 classroom_obj = joined_class
                 break
-        posts = classroom_obj.list_posts(sql_database=sql_database)
-        classroom_details = {}
-        classroom_details["creator_name"] = classroom_obj.get_creator_name(sql_database=sql_database)[0][0]
-        classroom_details["name"] = classroom_obj.name
-        classroom_details["description"] = classroom_obj.description
-        # print(classroom_details["creator_name"])
-        post_list = []
-        for post in posts:
-            post_list.append({"postID":post[0], "classID":post[1], "timestamp":post[2], "creator_userID":post[3], "content":post[4]})
-        username = user.name
-        return render_html("class.html", posts=post_list, details=classroom_details, username = username)
+
+        if app.method == "POST":
+            form_data = app.form_data
+            content = form_data["content"]
+            tag = form_data["tag"]
+            post = Post(classID=classroom_obj.classID, creator_userID=user.userID, content=content)
+        else:
+            posts = classroom_obj.list_posts(sql_database=sql_database)
+            user_details = {}
+            user_details["username"] = user.name
+            user_details["userID"] = user.userID
+            classroom_details = {}
+            classroom_details["creator_name"] = classroom_obj.get_creator_name(sql_database=sql_database)[0][0]
+            classroom_details["creater_userID"] = classroom_obj.creator_userID
+            classroom_details["name"] = classroom_obj.name
+            classroom_details["description"] = classroom_obj.description
+            post_list = []
+            for post in posts:
+                post_list.append({"postID":post[0], "classID":post[1], "timestamp":post[2], "creator_userID":post[3], "content":post[4]})
+            return render_html("class.html", posts=post_list, details=classroom_details, user_details = user_details)
 app.route("access_classroom", access_classroom)
 
 def create_classroom():
