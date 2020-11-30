@@ -1,0 +1,19 @@
+<html>
+    <body>
+        <p style="text-align:right;">{{username}}</p>
+        <h1>Classroom name: {{classroom_name}}</h1>
+        <h2>Group Discussion Topic: {{gd_topic}}</h2>
+            Private Messages: 
+            {% for priv in private_list %}
+                From: {{priv.sender_userID}} At {{priv.timestamp}} ->
+                {{priv.content}}
+            {% endfor %}
+            <hr>
+            Public Messages:
+            {% for pub in public_list %}
+                From: {{pub.sender_userID}} At {{pub.timestamp}} ->
+                {{pub.content}}
+            {% endfor %}
+        
+    </body>
+</html>

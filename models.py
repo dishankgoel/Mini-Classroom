@@ -303,7 +303,21 @@ class Group_discussion:
         db_cursor.close()
 
     def get_messages(self, sql_database):
-        pass
+        db_cursor = sql_database.cursor()
+        sql = '''SELECT * FROM GDMessages WHERE gdID = %s'''
+        db_cursor.execute(sql, (self.gdID,))
+        msgs = db_cursor.fetchall()
+        private_list = []
+        public_list = []
+        print("msgs:", msgs)
+        for msg in msgs:
+            if msg[4]==-1:
+                public_list.append({"msgID":msg[0], "gdID":msg[1], "sender_userID":msg[2], "timestamp":msg[3], "private":msg[4], "content":msg[5]})
+            else:
+                private_list.append({"msgID":msg[0], "gdID":msg[1], "sender_userID":msg[2], "timestamp":msg[3], "private":msg[4], "content":msg[5]})
+                
+        db_cursor.close()
+        return public_list, private_list
 
 class GD_message:
     def __init__(self, msgID, gdID, sender_userID, timestamp, private, content):

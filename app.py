@@ -10,7 +10,7 @@ app_secret = '^gr05fr78^&tr3vr'
 
 DB_HOST = "localhost"
 DB_USER = "root"
-DB_PASS = "root"
+DB_PASS = "Proj@Py19"
 
 sql_database = mysql.connector.connect(
     host = DB_HOST,
@@ -211,7 +211,7 @@ def discussions(class_id):
             if joined_class.classID == class_id:
                 classroom_obj = joined_class
                 break
-        print("class ID is:", class_id)
+        # print("class ID is:", class_id)
         
         if app.method == "POST":
             if(user.userID == classroom_obj.creator_userID):
@@ -239,6 +239,45 @@ def discussions(class_id):
 app.route("discussions", discussions)
 
 
-def access_discussion(gdID):
-    pass
+def access_discussion(gdID, class_id):
+    ret_code, user = validate_login(app.headers)
+    if(ret_code == 0):
+        return user
+    else:
+        joined_classes = user.list_classrooms(sql_database)
+        class_ids = [joined_class.classID for joined_class in joined_classes]
+        if class_id not in class_ids:
+            return error(200, "You are not a part of this classroom")
+        classroom_obj = Classroom(classID=class_id)
+        for joined_class in joined_classes:
+            if joined_class.classID == class_id:
+                classroom_obj = joined_class
+                break
+        gd_list = classroom_obj.get_group_discussions(sql_database)
+        gd_obj = None
+        gdIDs = [gd.gdID for gd in gd_list]
+        if gdID not in gdIDs:
+            return error(200, "Group discussion not found in this classroom")
+        for gd in gd_list:
+            if gd.gdID == gdID:
+                gd_obj = gd
+                break
+        instructor = (user.userID == classroom_obj.creator_userID)
+        print("GD_ID is - ", gd_obj.gdID)
+        if app.method == "POST":
+            pass
+        else:
+            public_list, tmp_private_list = gd_obj.get_messages(sql_database)
+            private_list = []
+            if instructor:
+                # teacher view
+                private_list = tmp_private_list
+            else:
+                # student view
+                private_list = []
+                for priv_msg in tmp_private_list:
+                    if priv_msg["sender_userID"] == user.userID:
+                        private_list.append(priv_msg)
+            return render_html("discussion.html", private_list = private_list, public_list = public_list, is_instructor = instructor, gd_topic=gd_obj.gd_topic, classroom_name = classroom_obj.name, username = user.name)
+        
 app.route("access_discussion", access_discussion)
