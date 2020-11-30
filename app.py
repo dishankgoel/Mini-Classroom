@@ -120,7 +120,9 @@ def access_classroom(class_id):
             for post in posts:
                 tag_name = post.get_tag(sql_database)
                 post_list.append({"postID":post.postID, "classID":post.classID, "timestamp":post.timestamp, "creator_userID":post.creator_userID, "content":post.content, "tag":tag_name})
-            return render_html("class.html", posts=post_list, details=classroom_details, user_details = user_details)
+            
+            if_class_live = LiveClass(classID=classroom_obj.classID).check_if_live(sql_database)
+            return render_html("class.html", posts=post_list, details=classroom_details, user_details = user_details, if_class_live = if_class_live)
 app.route("access_classroom", access_classroom)
 
 def create_classroom():
@@ -173,5 +175,24 @@ app.route("/start_class", start_classroom_session)
 
 
 def join_live_class(classID):
-    pass
+    ret_code, user = validate_login(app.headers)
+    if(ret_code == 0):
+        return user
+    else:
+        live_class = LiveClass(classID=classID)
+        if_live = live_class.check_if_live(sql_database)
+        if not if_live:
+            return error(400, "The class has not started yet.")
+        if app.method == "GET":
+            live_messages = LiveMessages(liveclassID=live_class.liveclassID)
+            live_messages.get_all_messages(sql_database)
+            classroom_details = Classroom(classID=classID).get_class_details(sql_database)
+            return render_html("live_class.html", messages = live_messages.all_messages, classroom_details = classroom_details)
+        elif app.method == "POST":
+            message = app.form_data["message"]
+            live_message = LiveMessages(liveclassID=live_class.liveclassID, userID=user.userID, content=message)
+            live_message.send_message(sql_database)
+            return redirect("/classrooms/{}/live".format(live_class.liveclassID))
+        else:
+            return error(405)
 app.route("join_live_class", join_live_class)

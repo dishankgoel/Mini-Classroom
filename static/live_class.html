@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Chat</title>
+		<link href="/static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/static/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+		<script src="/static/vendor/jquery/jquery.min.js"></script>
+        <script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="/static/vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css">
+		<script type="text/javascript" src="/static/vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="/static/css/chat.css">
+    </head>
+	<body>
+        <h1>Classroom name: {{classroom_details.name}}</h1>
+        <h2>Created by: {{classroom_details.creator_name}}</h2>
+        <p>{{classroom_details.description}}</p>
+        <hr>
+		<div class="container-fluid h-100">
+			<div class="row justify-content-center h-100">
+				<div class="col-md-8 col-xl-6 chat">
+					<div class="card">
+						<div class="card-header msg_head">
+							<div class="d-flex bd-highlight">
+								<div class="user_info">
+									<span>Welcome to Live Class</span>
+                                </div>
+							</div>
+                        </div>
+						<div class="card-body msg_card_body">
+                            {% for message in messages %}
+                                <div class="d-flex justify-content-start mb-4">
+                                    <div class="img_cont_msg">
+                                        <!-- <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img_msg"> -->
+                                        <div style="padding-top: 7px;color: black;">{{ message.name }}</div>
+                                    </div>
+                                    <div class="msg_cotainer">
+                                        {{ message.content }}
+                                        <span class="msg_time">{{ message.timestamp }}</span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        
+						<div class="card-footer">
+							<form action="" method="POST">
+								<div class="input-group">
+									<input name="message" class="form-control type_msg" placeholder="Type your message...">
+									<div class="input-group-append">
+										<button type="submit" class="input-group-text send_btn"><i class="fas fa-location-arrow"></i> </button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

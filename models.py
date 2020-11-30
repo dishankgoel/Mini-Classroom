@@ -10,6 +10,17 @@ class Classroom:
         self.description = description
         self.joining_code = joining_code
 
+    def get_class_details(self, sql_database):
+
+        db_cursor = sql_database.cursor()
+        sql = '''SELECT * from Classrooms WHERE classID = %s'''
+        db_cursor.execute(sql, (self.classID,))
+        results = db_cursor.fetchall()
+        db_cursor.close()
+        details = { "classID": self.classID, "creator_userID": results[0][1], "name": results[0][2], "description": results[0][3], "joining_code": results[0][4]}
+        return details
+
+
     def add_class(self, sql_database):
         
         db_cursor = sql_database.cursor()
@@ -29,6 +40,7 @@ class Classroom:
         sql = '''SELECT classID FROM Classrooms WHERE code = %s'''
         db_cursor.execute(sql, (self.joining_code,))
         results = db_cursor.fetchall()
+        db_cursor.close()
         # assert(len(results) == 1)
         return int(results[0][0])
 
@@ -37,6 +49,7 @@ class Classroom:
         db_cursor = sql_database.cursor()
         db_cursor.execute(sql, (self.classID,))
         posts = db_cursor.fetchall()
+        db_cursor.close()
         posts_list = []
         for post in posts:
             posts_list.append(Post(postID=post[0], classID=post[1], timestamp=post[2], creator_userID=post[3], content=post[4]))
@@ -47,6 +60,7 @@ class Classroom:
         creator_name_sql = "SELECT name from Users WHERE userID=%s"
         db_cursor.execute(creator_name_sql, (self.creator_userID,))
         creator_name = db_cursor.fetchall()
+        db_cursor.close()
         return creator_name
 
 class Post:
@@ -74,6 +88,7 @@ class Post:
         val = (self.postID, self.classID)
         db_cursor.execute(sql, val)
         results = db_cursor.fetchall()
+        db_cursor.close()
         if(len(results) == 1):
             return results[0][0]
 
@@ -83,6 +98,14 @@ class User:
         self.emailID = emailID
         self.password = password
         self.name = name
+    
+    def get_name_of_user(self, sql_database):
+
+        db_cursor = sql_database.cursor()
+        db_cursor.execute('''SELECT name from Users WHERE userID = %s''', (self.userID,))
+        results = db_cursor.fetchall()
+        db_cursor.close()
+        return results[0][0]
 
     def add_user(self, sql_database):
         
@@ -159,8 +182,9 @@ class Tag:
     def list_posts_under_tag(self, sql_database):
         db_cursor = sql_database.cursor()
         sql = '''SELECT * from Posts INNER JOIN PostTags ON Posts.classID = PostTags.classID AND PostTags.tagName = %s'''
-        db_cursor.execute(sql, self.tagName)
+        db_cursor.execute(sql, (self.tagName,))
         results = db_cursor.fetchall()
+        db_cursor.close()
         posts_list = []
         for post in results:
             posts_list.append(Post(postID=post[0], classID=post[1], timestamp=post[2], creator_userID=post[3], content=post.content))
@@ -182,7 +206,6 @@ class Classroom_user_role:
         sql_database.commit()
         db_cursor.close()
 
-
 class LiveClass:
 
     def __init__(self, liveclassID=None, classID=None):
@@ -192,25 +215,67 @@ class LiveClass:
     
     def check_if_live(self, sql_database):
         
-
-
-    def start(self, sql_database):
-
         db_cursor = sql_database.cursor()
         sql = '''SELECT * FROM LiveClass WHERE classID = %s'''
         db_cursor.execute(sql, (self.classID,))
         results = db_cursor.fetchall()
+        db_cursor.close()
         if(len(results) > 0):
-            return 0
-        sql = '''INSERT INTO LiveClass (classID) VALUES (%s)'''
-        db_cursor.execute(sql, self.classID)
-        sql_database.commit()
-        return 1
+            self.liveclassID = results[0][0]
+            return 1
+        return 0
+
+    def start(self, sql_database):
+
+        if_live = self.check_if_live(sql_database)
+        if not if_live:
+            db_cursor = sql_database.cursor()
+            sql = '''INSERT INTO LiveClass (classID) VALUES (%s)'''
+            db_cursor.execute(sql, (self.classID,))
+            sql_database.commit()
+            db_cursor.close()
+            return 1
+        return 0
     
     def end_class(self, sql_database):
 
         db_cursor = sql_database.cursor()
         sql = '''DELETE FROM LiveClass WHERE classID = %s'''
-        db_cursor.execute(sql, self.classID)
+        db_cursor.execute(sql, (self.classID,))
         sql_database.commit()
+        db_cursor.close()
+        
+class LiveMessages:
+
+    def __init__(self, livemessageID = None, liveclassID = None, userID = None, content = None, timestamp = None):
+
+        self.livemessageID = livemessageID
+        self.liveclassID = liveclassID
+        self.userID = userID
+        self.content = content
+        self.timestamp = timestamp
+        self.all_messages = []
+
+    def get_all_messages(self, sql_database):
+
+        db_cursor = sql_database.cursor()
+        sql = '''SELECT * from LiveMessages WHERE liveclassID = %s'''
+        db_cursor.execute(sql, (self.liveclassID,))
+        results = db_cursor.fetchall()
+        for result in results:
+            userid, content, timestamp = result[2], result[3], result[4]
+            name = User(userID=userid).get_name_of_user(sql_database)
+            data = {"name": name, "content": content, "timestamp": timestamp}
+            self.all_messages.append(data)
+
+    def send_message(self, sql_database):
+
+        db_cursor = sql_database.cursor()
+        sql = '''INSERT INTO LiveMessages (liveclassID, userID, content) VALUES (%s, %s, %s)'''
+        val = (self.liveclassID, self.userID, self.content)
+        db_cursor.execute(sql, val)
+        sql_database.commit()
+        db_cursor.close()
+
+
         

@@ -54,12 +54,19 @@ make_classroom_user_role = '''CREATE TABLE ClassUserRole (
 
 make_live_classes = '''CREATE TABLE LiveClass (
     liveclassID INT AUTO_INCREMENT PRIMARY KEY,
-    classID INT,
-)
+    classID INT
+)'''
 
-'''
+make_live_messages = '''CREATE TABLE LiveMessages (
+    livemessageID INT AUTO_INCREMENT PRIMARY KEY,
+    liveclassID INT,
+    userID INT,
+    content TEXT,
+    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+)'''
 
-sql_queries = [make_classrooms, make_posts, make_users, make_comments, make_tags, make_classroom_user_role]
+
+sql_queries = [make_classrooms, make_posts, make_users, make_tags, make_classroom_user_role, make_live_classes, make_live_messages]
 
 for query in sql_queries:
     dbcursor.execute(query)
