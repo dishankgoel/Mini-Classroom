@@ -320,10 +320,18 @@ class Group_discussion:
         return public_list, private_list
 
 class GD_message:
-    def __init__(self, msgID, gdID, sender_userID, timestamp, private, content):
+    def __init__(self, msgID=None, gdID=None, sender_userID=None, timestamp=None, private=None, content=None):
         self.msgID = msgID
         self.gdID = gdID
         self.sender_userID = sender_userID
         self.timestamp = timestamp
         self.private = private
         self.content = content
+
+    def add_msg(self, sql_database):
+        db_cursor = sql_database.cursor()
+        sql = '''INSERT INTO GDMessages (gdID, sender_userID, private, content) VALUES (%s, %s, %s, %s)'''
+        val = (self.gdID, self.sender_userID, self.private, self.content)
+        db_cursor.execute(sql, val)
+        sql_database.commit()
+        db_cursor.close()

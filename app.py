@@ -265,9 +265,45 @@ def access_discussion(gdID, class_id):
         instructor = (user.userID == classroom_obj.creator_userID)
         print("GD_ID is - ", gd_obj.gdID)
         if app.method == "POST":
-            pass
+            receiver = None
+            private_msg = None
+            public_msg = None
+            form_data = app.form_data
+            if "receiver" in form_data.keys():
+                receiver = form_data["receiver"]
+            if "private_msg" in form_data.keys():
+                private_msg = form_data["private_msg"]
+            if "public_msg" in form_data.keys():
+                public_msg = form_data["public_msg"]
+            if public_msg != None:
+                public_msg_obj = GD_message(gdID=gd_obj.gdID, sender_userID=user.userID, private=-1, content=public_msg)
+                public_msg_obj.add_msg(sql_database)
+            if instructor:
+                if private_msg != None:
+                    if receiver != None:
+                        private_msg_obj = GD_message(gdID=gd_obj.gdID, sender_userID=user.userID, private=receiver, content=private_msg)
+                        private_msg_obj.add_msg(sql_database)
+                    else:
+                        return error(200, "No receiver for private message")
+            else:
+                    private_msg_obj = GD_message(gdID=gd_obj.gdID, sender_userID=user.userID, private=classroom_obj.creator_userID, content=private_msg)
+                    private_msg_obj.add_msg(sql_database)
+            return redirect("/classrooms/{}/group_discussions/{}".format(class_id, gd_obj.gdID))
+
         else:
             public_list, tmp_private_list = gd_obj.get_messages(sql_database)
+            for priv_msg in tmp_private_list:
+                user_tmp_obj = User(userID = priv_msg["sender_userID"])
+                username_tmp = user_tmp_obj.get_name_of_user(sql_database)
+                # print(username_tmp)
+                receiver_tmp_obj = User(userID = priv_msg["private"])
+                priv_msg["recvname"] = receiver_tmp_obj.get_name_of_user(sql_database)
+                priv_msg["username"] = username_tmp
+            for pub_msg in public_list:
+                user_tmp_obj = User(userID = pub_msg["sender_userID"])
+                username_tmp = user_tmp_obj.get_name_of_user(sql_database)
+                # print(username_tmp)
+                pub_msg["username"] = username_tmp
             private_list = []
             if instructor:
                 # teacher view
@@ -276,8 +312,8 @@ def access_discussion(gdID, class_id):
                 # student view
                 private_list = []
                 for priv_msg in tmp_private_list:
-                    if priv_msg["sender_userID"] == user.userID:
+                    if priv_msg["sender_userID"] == user.userID or priv_msg["private"] == user.userID:
                         private_list.append(priv_msg)
-            return render_html("discussion.html", private_list = private_list, public_list = public_list, is_instructor = instructor, gd_topic=gd_obj.gd_topic, classroom_name = classroom_obj.name, username = user.name)
+            return render_html("discussion.html", private_list = private_list, public_list = public_list, is_instructor = instructor, gd_topic=gd_obj.gd_topic, classroom_name = classroom_obj.name, username = user.name, class_id = classroom_obj.classID, gdID = gd_obj.gdID)
         
 app.route("access_discussion", access_discussion)

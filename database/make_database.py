@@ -76,7 +76,7 @@ make_gd_messages = '''CREATE TABLE GDMessages (
     msgID INT AUTO_INCREMENT PRIMARY KEY,
     gdID INT,
     sender_userID INT,
-    timestamp DATE,
+    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     private INT,
     content VARCHAR(100)
 )'''
