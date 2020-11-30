@@ -45,9 +45,18 @@ class Handler():
 
         if "/classrooms/" in self.path:
             # try:
-            class_id = int(self.path.split("/")[-1])
+            args = self.path.split("/")
+            class_id = int(self.path.split("/")[2])
+            print(args) #debugging
             app.set_request_data(self.headers, self.query_string, self.form_data, self.method)
-            return app.routes["access_classroom"](class_id)
+            if len(args)==3:
+                return app.routes["access_classroom"](class_id)
+            elif args[3]=="group_discussions":
+                if len(args)==4:
+                    return app.routes["discussions"](class_id)
+                else:
+                    gdID = int(self.path.split("/")[4])
+                    return app.routes["access_discussion"](gdID)
             # except:
             # return error(404)
 

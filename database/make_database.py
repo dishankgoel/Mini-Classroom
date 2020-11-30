@@ -7,7 +7,7 @@ ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';
 conn = mysql.connector.connect(
     host = "localhost",
     user = "root",
-    password = "root"
+    password = "Proj@Py19"
 )
 
 dbcursor = conn.cursor()
@@ -60,7 +60,22 @@ make_classroom_user_role = '''CREATE TABLE ClassUserRole (
     role INT
 )'''
 
-sql_queries = [make_classrooms, make_posts, make_users, make_comments, make_tags, make_classroom_user_role]
+make_group_discussions = '''CREATE TABLE GroupDiscussions (
+    gdID INT AUTO_INCREMENT PRIMARY KEY,
+    classID INT,
+    gdTopic VARCHAR(100)    
+)'''
+
+make_gd_messages = '''CREATE TABLE GDMessages (
+    msgID INT AUTO_INCREMENT PRIMARY KEY,
+    gdID INT,
+    sender_userID INT,
+    timestamp DATE,
+    private INT,
+    content VARCHAR(100)
+)'''
+
+sql_queries = [make_classrooms, make_posts, make_users, make_comments, make_tags, make_classroom_user_role, make_group_discussions, make_gd_messages]
 
 for query in sql_queries:
     dbcursor.execute(query)

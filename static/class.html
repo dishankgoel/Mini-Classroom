@@ -4,6 +4,7 @@
         <h1>Classroom name: {{details.name}}</h1>
         <h2>Created by: {{details.creator_name}}</h2>
         <p>{{details.description}}</p>
+        <a href="/classrooms/{{details.classID}}/group_discussions" class="btn btn-primary stretched-link">Go to Group Discussions</a>
         <hr>
         {% if details.creator_userID|int() == user_details.userID|int() %}
             <form action="/classrooms/{{details.classID}}" method="POST">
