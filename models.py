@@ -296,15 +296,15 @@ class LiveClass:
 
 
 class Group_discussion:
-    def __init__(self, classID, gdID, gd_topic):
+    def __init__(self, classID=None, gdID=None, gd_topic=None):
         self.gdID = gdID
         self.classID = classID
         self.gd_topic = gd_topic
 
     def add_gd(self, sql_database):
         db_cursor = sql_database.cursor()
-        sql = '''INSERT INTO GroupDiscussions (gdID, classID, gdTopic) VALUES (%s, %s, %s)'''
-        val = (self.gdID, self.classID, self.gd_topic)
+        sql = '''INSERT INTO GroupDiscussions (classID, gdTopic) VALUES (%s, %s)'''
+        val = (self.classID, self.gd_topic)
         db_cursor.execute(sql, val)
         sql_database.commit()
         db_cursor.close()

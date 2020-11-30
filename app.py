@@ -10,7 +10,7 @@ app_secret = '^gr05fr78^&tr3vr'
 
 DB_HOST = "localhost"
 DB_USER = "root"
-DB_PASS = "Proj@Py19"
+DB_PASS = "root"
 
 sql_database = mysql.connector.connect(
     host = DB_HOST,
@@ -237,9 +237,9 @@ def discussions(class_id):
             if(user.userID == classroom_obj.creator_userID):
                 form_data = app.form_data
                 gd_topic = form_data["gd_topic"]
-                gd = Group_discussion(classID=classroom_obj.classID, gdID=None, gd_topic=gd_topic)
+                gd = Group_discussion(classID=classroom_obj.classID, gd_topic=gd_topic)
                 gd.add_gd(sql_database)
-                print("classroom_obj", classroom_obj)
+                # print("classroom_obj", classroom_obj)
                 return redirect("/classrooms/{}/group_discussions".format(class_id))
             else:
                 return error(200, "You are not a Instructor. Only instructors can create a Group Discussion on Classroom")
