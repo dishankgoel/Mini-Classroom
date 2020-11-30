@@ -140,16 +140,6 @@ class User:
         db_cursor.close()
         return joined_classrooms
 
-
-
-class Comment:
-    def __init__(self, commentID, postID, creator_userID, timestamp, content):
-        self.commentID = commentID
-        self.postID = postID
-        self.creator_userID = creator_userID
-        self.timestamp = timestamp
-        self.content = content
-
 class Tag:
     def __init__(self, tagID=None, tagName=None, postID=None, classID=None):
         self.tagID = tagID
@@ -192,11 +182,35 @@ class Classroom_user_role:
         sql_database.commit()
         db_cursor.close()
 
-# Can be Implemented using JOIN in sql
-#  
-# class Tag_post_map:
-#     def __init__(self, postID, tagID):
-#         self.postID = postID
-#         self.tagID = tagID
+
+class LiveClass:
+
+    def __init__(self, liveclassID=None, classID=None):
+
+        self.liveclassID = liveclassID
+        self.classID = classID
+    
+    def check_if_live(self, sql_database):
         
+
+
+    def start(self, sql_database):
+
+        db_cursor = sql_database.cursor()
+        sql = '''SELECT * FROM LiveClass WHERE classID = %s'''
+        db_cursor.execute(sql, (self.classID,))
+        results = db_cursor.fetchall()
+        if(len(results) > 0):
+            return 0
+        sql = '''INSERT INTO LiveClass (classID) VALUES (%s)'''
+        db_cursor.execute(sql, self.classID)
+        sql_database.commit()
+        return 1
+    
+    def end_class(self, sql_database):
+
+        db_cursor = sql_database.cursor()
+        sql = '''DELETE FROM LiveClass WHERE classID = %s'''
+        db_cursor.execute(sql, self.classID)
+        sql_database.commit()
         

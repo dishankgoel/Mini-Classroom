@@ -39,14 +39,6 @@ make_users = '''CREATE TABLE Users (
     name VARCHAR(100)
 )'''
 
-make_comments = '''CREATE TABLE Comments (
-    commentID INT AUTO_INCREMENT PRIMARY KEY,
-    postID INT,
-    creator_userID INT,
-    timestamp DATE,
-    content TEXT
-)'''
-
 make_tags = '''CREATE TABLE PostTags (
     tagID INT AUTO_INCREMENT PRIMARY KEY,
     tagName VARCHAR(100),
@@ -59,6 +51,13 @@ make_classroom_user_role = '''CREATE TABLE ClassUserRole (
     userID INT,
     role INT
 )'''
+
+make_live_classes = '''CREATE TABLE LiveClass (
+    liveclassID INT AUTO_INCREMENT PRIMARY KEY,
+    classID INT,
+)
+
+'''
 
 sql_queries = [make_classrooms, make_posts, make_users, make_comments, make_tags, make_classroom_user_role]
 

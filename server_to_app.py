@@ -45,9 +45,14 @@ class Handler():
 
         if "/classrooms/" in self.path:
             # try:
-            class_id = int(self.path.split("/")[-1])
+            args = self.path.split("/")
+            class_id = int(args[2])
             app.set_request_data(self.headers, self.query_string, self.form_data, self.method)
-            return app.routes["access_classroom"](class_id)
+            if(len(args) == 3):
+                return app.routes["access_classroom"](class_id)
+            elif(args[3] == "live"):
+                return app.routes["join_live_class"](class_id)
+
             # except:
             # return error(404)
 

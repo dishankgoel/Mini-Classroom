@@ -6,6 +6,15 @@
         <p>{{details.description}}</p>
         <hr>
         {% if details.creator_userID|int() == user_details.userID|int() %}
+            
+            <form action="/start_class" method="POST">
+                <div class="form-group">
+                    <!-- <label for="content">Content:</label> -->
+                    <input type="hidden" class="form-control" id="classid" name="classid" value="{{details.classID}}">
+                </div>
+                <button type="submit" class="btn btn-primary">Start a live class</button>
+            </form>
+            
             <form action="/classrooms/{{details.classID}}" method="POST">
                 <div class="form-group">
                     <label for="content">Content:</label>

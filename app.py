@@ -153,3 +153,25 @@ def join_classroom():
         user_role.add_role(sql_database)
         return redirect("/classrooms")
 app.route("/JoinClass", join_classroom)
+
+def start_classroom_session():
+    ret_code, user = validate_login(app.headers)
+    if(ret_code == 0):
+        return user
+    else:
+        if(app.method == "POST"):
+            classID = app.form_data["classID"]
+            live_class = LiveClass(classID=classID)
+            status = live_class.start(sql_database)
+            if(status == 0):
+                return error(200, "The Class has already been started, please join the class at: /classrooms/{}/live".format(classID))
+            else:
+                return redirect("/classrooms/{}/live".format(classID))
+        else:
+            return error(405)
+app.route("/start_class", start_classroom_session)
+
+
+def join_live_class(classID):
+    pass
+app.route("join_live_class", join_live_class)
