@@ -10,7 +10,7 @@ app_secret = '^gr05fr78^&tr3vr'
 
 DB_HOST = "localhost"
 DB_USER = "root"
-DB_PASS = "root"
+DB_PASS = "Proj@Py19"
 
 sql_database = mysql.connector.connect(
     host = DB_HOST,
@@ -260,6 +260,81 @@ def discussions(class_id):
 app.route("discussions", discussions)
 
 
-def access_discussion(gdID):
-    pass
+def access_discussion(gdID, class_id):
+    ret_code, user = validate_login(app.headers)
+    if(ret_code == 0):
+        return user
+    else:
+        joined_classes = user.list_classrooms(sql_database)
+        class_ids = [joined_class.classID for joined_class in joined_classes]
+        if class_id not in class_ids:
+            return error(200, "You are not a part of this classroom")
+        classroom_obj = Classroom(classID=class_id)
+        for joined_class in joined_classes:
+            if joined_class.classID == class_id:
+                classroom_obj = joined_class
+                break
+        gd_list = classroom_obj.get_group_discussions(sql_database)
+        gd_obj = None
+        gdIDs = [gd.gdID for gd in gd_list]
+        if gdID not in gdIDs:
+            return error(200, "Group discussion not found in this classroom")
+        for gd in gd_list:
+            if gd.gdID == gdID:
+                gd_obj = gd
+                break
+        instructor = (user.userID == classroom_obj.creator_userID)
+        print("GD_ID is - ", gd_obj.gdID)
+        if app.method == "POST":
+            receiver = None
+            private_msg = None
+            public_msg = None
+            form_data = app.form_data
+            if "receiver" in form_data.keys():
+                receiver = form_data["receiver"]
+            if "private_msg" in form_data.keys():
+                private_msg = form_data["private_msg"]
+            if "public_msg" in form_data.keys():
+                public_msg = form_data["public_msg"]
+            if public_msg != None:
+                public_msg_obj = GD_message(gdID=gd_obj.gdID, sender_userID=user.userID, private=-1, content=public_msg)
+                public_msg_obj.add_msg(sql_database)
+            if instructor:
+                if private_msg != None:
+                    if receiver != None:
+                        private_msg_obj = GD_message(gdID=gd_obj.gdID, sender_userID=user.userID, private=receiver, content=private_msg)
+                        private_msg_obj.add_msg(sql_database)
+                    else:
+                        return error(200, "No receiver for private message")
+            else:
+                    private_msg_obj = GD_message(gdID=gd_obj.gdID, sender_userID=user.userID, private=classroom_obj.creator_userID, content=private_msg)
+                    private_msg_obj.add_msg(sql_database)
+            return redirect("/classrooms/{}/group_discussions/{}".format(class_id, gd_obj.gdID))
+
+        else:
+            public_list, tmp_private_list = gd_obj.get_messages(sql_database)
+            for priv_msg in tmp_private_list:
+                user_tmp_obj = User(userID = priv_msg["sender_userID"])
+                username_tmp = user_tmp_obj.get_name_of_user(sql_database)
+                # print(username_tmp)
+                receiver_tmp_obj = User(userID = priv_msg["private"])
+                priv_msg["recvname"] = receiver_tmp_obj.get_name_of_user(sql_database)
+                priv_msg["username"] = username_tmp
+            for pub_msg in public_list:
+                user_tmp_obj = User(userID = pub_msg["sender_userID"])
+                username_tmp = user_tmp_obj.get_name_of_user(sql_database)
+                # print(username_tmp)
+                pub_msg["username"] = username_tmp
+            private_list = []
+            if instructor:
+                # teacher view
+                private_list = tmp_private_list
+            else:
+                # student view
+                private_list = []
+                for priv_msg in tmp_private_list:
+                    if priv_msg["sender_userID"] == user.userID or priv_msg["private"] == user.userID:
+                        private_list.append(priv_msg)
+            return render_html("discussion.html", private_list = private_list, public_list = public_list, is_instructor = instructor, gd_topic=gd_obj.gd_topic, classroom_name = classroom_obj.name, username = user.name, class_id = classroom_obj.classID, gdID = gd_obj.gdID)
+        
 app.route("access_discussion", access_discussion)

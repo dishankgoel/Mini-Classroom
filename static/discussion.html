@@ -1,0 +1,43 @@
+<html>
+    <body>
+        <p style="text-align:right;">{{username}}</p>
+        <h1>Classroom name: {{classroom_name}}</h1>
+        <h2>Group Discussion Topic: {{gd_topic}}</h2>
+        
+        <h3>Private Messages: </h3>
+        <br>
+            {% for priv in private_list %}
+                From: {{priv.username}} At {{priv.timestamp}} to {{priv.recvname}}->
+                {{priv.content}}
+                <br>
+            {% endfor %}
+            <form action="/classrooms/{{class_id}}/group_discussions/{{gdID}}" method="POST">
+                {% if is_instructor %}
+                    <div class="form-group">
+                        <label for="receiver">Enter UserID of private message receiver:</label>
+                        <input type="text" class="form-control" id="receiver" placeholder="Private Message receiver UserID" name="receiver">
+                    </div>
+                {% endif %}
+                <div class="form-group">
+                  <label for="private_msg">Send a private message to instructor:</label>
+                  <input type="text" class="form-control" id="private_msg" placeholder="Private Message" name="private_msg">
+                </div>
+                <button type="submit" class="btn btn-primary">Send</button>
+            </form>
+            <hr>
+        <h3>Public Messages: </h3>
+        <br>
+            {% for pub in public_list %}
+                From: {{pub.username}} At {{pub.timestamp}} -> <br>
+                {{pub.content}}
+                <br>
+            {% endfor %}
+            <form action="/classrooms/{{class_id}}/group_discussions/{{gdID}}" method="POST">
+                <div class="form-group">
+                  <label for="public_msg">Send a public message to the Group Discussion:</label>
+                  <input type="text" class="form-control" id="public_msg" placeholder="Public Message" name="public_msg">
+                </div>
+                <button type="submit" class="btn btn-primary">Send</button>
+            </form>
+    </body>
+</html>
