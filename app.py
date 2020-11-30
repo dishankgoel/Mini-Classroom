@@ -10,7 +10,7 @@ app_secret = '^gr05fr78^&tr3vr'
 
 DB_HOST = "localhost"
 DB_USER = "root"
-DB_PASS = "Proj@Py19"
+DB_PASS = "root"
 
 sql_database = mysql.connector.connect(
     host = DB_HOST,
@@ -95,23 +95,31 @@ def access_classroom(class_id):
                 break
 
         if app.method == "POST":
-            form_data = app.form_data
-            content = form_data["content"]
-            tag = form_data["tag"]
-            post = Post(classID=classroom_obj.classID, creator_userID=user.userID, content=content)
+            if(user.userID == classroom_obj.creator_userID):
+                form_data = app.form_data
+                content = form_data["content"]
+                tag = form_data["tag"]
+                post = Post(classID=classroom_obj.classID, creator_userID=user.userID, content=content)
+                post.add_post(sql_database)
+                new_tag = Tag(tagName=tag, postID=post.postID, classID=classroom_obj.classID)
+                new_tag.add_tag(sql_database)
+                return redirect("/classrooms/{}".format(class_id))
+            else:
+                return error(200, "You are not a Instructor. Only instructors can post on Classroom")
         else:
             posts = classroom_obj.list_posts(sql_database=sql_database)
             user_details = {}
             user_details["username"] = user.name
             user_details["userID"] = user.userID
-            classroom_details = {}
+            classroom_details = {"classID": classroom_obj.classID}
             classroom_details["creator_name"] = classroom_obj.get_creator_name(sql_database=sql_database)[0][0]
-            classroom_details["creater_userID"] = classroom_obj.creator_userID
+            classroom_details["creator_userID"] = classroom_obj.creator_userID
             classroom_details["name"] = classroom_obj.name
             classroom_details["description"] = classroom_obj.description
             post_list = []
             for post in posts:
-                post_list.append({"postID":post[0], "classID":post[1], "timestamp":post[2], "creator_userID":post[3], "content":post[4]})
+                tag_name = post.get_tag(sql_database)
+                post_list.append({"postID":post.postID, "classID":post.classID, "timestamp":post.timestamp, "creator_userID":post.creator_userID, "content":post.content, "tag":tag_name})
             return render_html("class.html", posts=post_list, details=classroom_details, user_details = user_details)
 app.route("access_classroom", access_classroom)
 

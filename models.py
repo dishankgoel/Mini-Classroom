@@ -36,8 +36,11 @@ class Classroom:
         sql = "SELECT * from Posts WHERE CLASSID=%s"
         db_cursor = sql_database.cursor()
         db_cursor.execute(sql, (self.classID,))
-        posts = db_cursor.fetchall()        
-        return posts
+        posts = db_cursor.fetchall()
+        posts_list = []
+        for post in posts:
+            posts_list.append(Post(postID=post[0], classID=post[1], timestamp=post[2], creator_userID=post[3], content=post[4]))
+        return posts_list
 
     def get_creator_name(self, sql_database):
         db_cursor = sql_database.cursor()
@@ -60,7 +63,19 @@ class Post:
         val = (self.classID, self.creator_userID, self.content)
         db_cursor.execute(sql, val)
         sql_database.commit()
+        self.postID = db_cursor.lastrowid
+        db_cursor.close()
         # look into tagID classID postID relation before going ahead
+    
+    def get_tag(self, sql_database):
+
+        db_cursor = sql_database.cursor()
+        sql = '''SELECT tagName from PostTags WHERE postID = %s AND classID = %s'''
+        val = (self.postID, self.classID)
+        db_cursor.execute(sql, val)
+        results = db_cursor.fetchall()
+        if(len(results) == 1):
+            return results[0][0]
 
 class User:
     def __init__(self, emailID = None, password = None, name = None, userID = None):
@@ -136,10 +151,31 @@ class Comment:
         self.content = content
 
 class Tag:
-    def __init__(self, tagID, tagName, postID):
+    def __init__(self, tagID=None, tagName=None, postID=None, classID=None):
         self.tagID = tagID
         self.tagName = tagName
         self.postID = postID
+        self.classID = classID
+    
+    def add_tag(self, sql_database):
+        db_cursor = sql_database.cursor()
+        sql = '''INSERT INTO PostTags (tagName, postID, classID) VALUES (%s, %s, %s)'''
+        val = (self.tagName, self.postID, self.classID)
+        db_cursor.execute(sql, val)
+        sql_database.commit()
+        self.tagID = db_cursor.lastrowid
+        db_cursor.close()
+
+    def list_posts_under_tag(self, sql_database):
+        db_cursor = sql_database.cursor()
+        sql = '''SELECT * from Posts INNER JOIN PostTags ON Posts.classID = PostTags.classID AND PostTags.tagName = %s'''
+        db_cursor.execute(sql, self.tagName)
+        results = db_cursor.fetchall()
+        posts_list = []
+        for post in results:
+            posts_list.append(Post(postID=post[0], classID=post[1], timestamp=post[2], creator_userID=post[3], content=post.content))
+        return posts_list
+
 
 class Classroom_user_role:
     def __init__(self, classID, userID, role):

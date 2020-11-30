@@ -27,7 +27,7 @@ make_classrooms = '''CREATE TABLE Classrooms (
 make_posts = '''CREATE TABLE Posts (
     postID INT AUTO_INCREMENT PRIMARY KEY,
     classID INT,
-    timestamp DATE,
+    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     creator_userID INT,
     content TEXT
 )'''
@@ -50,7 +50,8 @@ make_comments = '''CREATE TABLE Comments (
 make_tags = '''CREATE TABLE PostTags (
     tagID INT AUTO_INCREMENT PRIMARY KEY,
     tagName VARCHAR(100),
-    postID INT
+    postID INT,
+    classID INT
 )'''
 
 make_classroom_user_role = '''CREATE TABLE ClassUserRole (
