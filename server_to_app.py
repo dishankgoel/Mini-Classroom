@@ -104,11 +104,13 @@ def find_content_type(path_of_file):
         content_type = "image/jpeg"
     return content_type
 
-def redirect(new_route, token = None):
+def redirect(new_route, token = None, token_expires = False):
     status_code = 302
     headers = {"Location": new_route}
     if token is not None:
         headers = {**headers, "Set-Cookie":"access_token={}".format(token)}
+    if token_expires:
+        headers["Set-Cookie"] += "; expires=Thu, 01 Jan 1970 00:00:00 GMT "
     return status_code, headers, b""
 
 def render_html(html_page, **kwargs):

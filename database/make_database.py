@@ -57,31 +57,32 @@ make_live_classes = '''CREATE TABLE LiveClass (
     classID INT
 )'''
 
-make_live_messages = '''CREATE TABLE LiveMessages (
-    livemessageID INT AUTO_INCREMENT PRIMARY KEY,
-    liveclassID INT,
-    userID INT,
-    content TEXT,
-    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-)'''
+# make_live_messages = '''CREATE TABLE LiveMessages (
+#     livemessageID INT AUTO_INCREMENT PRIMARY KEY,
+#     liveclassID INT,
+#     userID INT,
+#     content TEXT,
+#     timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+# )'''
 
 
 make_group_discussions = '''CREATE TABLE GroupDiscussions (
     gdID INT AUTO_INCREMENT PRIMARY KEY,
     classID INT,
-    gdTopic VARCHAR(100)    
+    gdTopic VARCHAR(100),    
+    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 )'''
 
 make_gd_messages = '''CREATE TABLE GDMessages (
     msgID INT AUTO_INCREMENT PRIMARY KEY,
     gdID INT,
     sender_userID INT,
-    timestamp DATE,
+    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     private INT,
     content VARCHAR(100)
 )'''
 
-sql_queries = [make_classrooms, make_posts, make_users, make_tags, make_classroom_user_role, make_group_discussions, make_gd_messages, make_live_classes, make_live_messages]
+sql_queries = [make_classrooms, make_posts, make_users, make_tags, make_classroom_user_role, make_group_discussions, make_gd_messages, make_live_classes]
 
 
 for query in sql_queries:

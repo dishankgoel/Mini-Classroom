@@ -18,7 +18,9 @@ class Classroom:
         db_cursor.execute(sql, (self.classID,))
         results = db_cursor.fetchall()
         db_cursor.close()
-        details = { "classID": self.classID, "creator_userID": results[0][1], "name": results[0][2], "description": results[0][3], "joining_code": results[0][4]}
+        self.creator_userID = results[0][1]
+        creator_name = self.get_creator_name(sql_database)[0][0]
+        details = { "classID": self.classID, "creator_userID": results[0][1], "name": results[0][2], "description": results[0][3], "joining_code": results[0][4], "creator_name": creator_name}
         return details
 
 
@@ -243,49 +245,54 @@ class LiveClass:
             sql = '''INSERT INTO LiveClass (classID) VALUES (%s)'''
             db_cursor.execute(sql, (self.classID,))
             sql_database.commit()
+            self.liveclassID = db_cursor.lastrowid
             db_cursor.close()
             return 1
         return 0
     
-    def end_class(self, sql_database):
+    # def end_class(self, sql_database):
 
-        db_cursor = sql_database.cursor()
-        sql = '''DELETE FROM LiveClass WHERE classID = %s'''
-        db_cursor.execute(sql, (self.classID,))
-        sql_database.commit()
-        db_cursor.close()
+    #     db_cursor = sql_database.cursor()
+    #     sql = '''DELETE FROM LiveClass WHERE classID = %s'''
+    #     db_cursor.execute(sql, (self.classID,))
+    #     sql_database.commit()
+    #     sql = '''DELETE FROM LiveMessages WHERE liveclassID = %s'''
+    #     db_cursor.execute(sql, (self.liveclassID))
+    #     sql_database.commit()
+    #     db_cursor.close()
+    #     return 1
         
-class LiveMessages:
+# class LiveMessages:
 
-    def __init__(self, livemessageID = None, liveclassID = None, userID = None, content = None, timestamp = None):
+#     def __init__(self, livemessageID = None, liveclassID = None, userID = None, content = None, timestamp = None):
 
-        self.livemessageID = livemessageID
-        self.liveclassID = liveclassID
-        self.userID = userID
-        self.content = content
-        self.timestamp = timestamp
-        self.all_messages = []
+#         self.livemessageID = livemessageID
+#         self.liveclassID = liveclassID
+#         self.userID = userID
+#         self.content = content
+#         self.timestamp = timestamp
+#         self.all_messages = []
 
-    def get_all_messages(self, sql_database):
+#     def get_all_messages(self, sql_database):
 
-        db_cursor = sql_database.cursor()
-        sql = '''SELECT * from LiveMessages WHERE liveclassID = %s'''
-        db_cursor.execute(sql, (self.liveclassID,))
-        results = db_cursor.fetchall()
-        for result in results:
-            userid, content, timestamp = result[2], result[3], result[4]
-            name = User(userID=userid).get_name_of_user(sql_database)
-            data = {"name": name, "content": content, "timestamp": timestamp}
-            self.all_messages.append(data)
+#         db_cursor = sql_database.cursor()
+#         sql = '''SELECT * from LiveMessages WHERE liveclassID = %s'''
+#         db_cursor.execute(sql, (self.liveclassID,))
+#         results = db_cursor.fetchall()
+#         for result in results:
+#             userid, content, timestamp = result[2], result[3], result[4]
+#             name = User(userID=userid).get_name_of_user(sql_database)
+#             data = {"name": name, "content": content, "timestamp": timestamp}
+#             self.all_messages.append(data)
 
-    def send_message(self, sql_database):
+#     def send_message(self, sql_database):
 
-        db_cursor = sql_database.cursor()
-        sql = '''INSERT INTO LiveMessages (liveclassID, userID, content) VALUES (%s, %s, %s)'''
-        val = (self.liveclassID, self.userID, self.content)
-        db_cursor.execute(sql, val)
-        sql_database.commit()
-        db_cursor.close()
+#         db_cursor = sql_database.cursor()
+#         sql = '''INSERT INTO LiveMessages (liveclassID, userID, content) VALUES (%s, %s, %s)'''
+#         val = (self.liveclassID, self.userID, self.content)
+#         db_cursor.execute(sql, val)
+#         sql_database.commit()
+#         db_cursor.close()
 
 
 class Group_discussion:

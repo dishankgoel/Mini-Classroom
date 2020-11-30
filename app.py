@@ -31,6 +31,20 @@ def validate_login(headers):
         except:
             return 0, error(200, "Either the user does not exist or the given password is wrong. Please Try again")
 
+def validate_classroom(classID, user):
+
+    joined_classes = user.list_classrooms(sql_database)
+    class_ids = [joined_class.classID for joined_class in joined_classes]
+    if classID not in class_ids:
+        return 0, error(200, "You are not a part of this classroom")
+    classroom_obj = Classroom(classID=classID)
+    for joined_class in joined_classes:
+        if joined_class.classID == classID:
+            classroom_obj = joined_class
+            break
+    return 1, classroom_obj
+
+
 def hello():
     return render_html("index.html")
 app.route("/", hello)
@@ -66,6 +80,10 @@ def login():
         return render_html("login.html")
 app.route("/login", login)
 
+def logout():
+    return redirect(new_route="/", token="", token_expires = True)
+app.route("/logout", logout)
+
 def classrooms():
     ret_code, user = validate_login(app.headers)
     if(ret_code == 0):
@@ -84,16 +102,9 @@ def access_classroom(class_id):
     if(ret_code == 0):
         return user
     else:
-        joined_classes = user.list_classrooms(sql_database)
-        class_ids = [joined_class.classID for joined_class in joined_classes]
-        if class_id not in class_ids:
-            return error(200, "You are not a part of this classroom")
-        classroom_obj = Classroom(classID=class_id)
-        for joined_class in joined_classes:
-            if joined_class.classID == class_id:
-                classroom_obj = joined_class
-                break
-
+        ret_code, classroom_obj = validate_classroom(class_id, user)
+        if(ret_code == 0):
+            return classroom_obj
         if app.method == "POST":
             if(user.userID == classroom_obj.creator_userID):
                 form_data = app.form_data
@@ -173,46 +184,55 @@ def start_classroom_session():
             return error(405)
 app.route("/start_class", start_classroom_session)
 
+# def end_classroom_session():
+#     ret_code, user = validate_login(app.headers)
+#     if(ret_code == 0):
+#         return user
+#     else:
+#         if(app.method == "POST"):
+#             classID = app.form_data["classID"]
+#             live_class = LiveClass(classID=classID)
+#             if_live = live_class.check_if_live(sql_database)
+#             if if_live:
+#                 status = live_class.end_class(sql_database)
+#             return redirect("/classrooms/{}".format(classID))
+#         else:
+#             return error(405)
+# app.route("/end_class", end_classroom_session)
 
-def join_live_class(classID):
-    ret_code, user = validate_login(app.headers)
-    if(ret_code == 0):
-        return user
-    else:
-        live_class = LiveClass(classID=classID)
-        if_live = live_class.check_if_live(sql_database)
-        if not if_live:
-            return error(400, "The class has not started yet.")
-        if app.method == "GET":
-            live_messages = LiveMessages(liveclassID=live_class.liveclassID)
-            live_messages.get_all_messages(sql_database)
-            classroom_details = Classroom(classID=classID).get_class_details(sql_database)
-            return render_html("live_class.html", messages = live_messages.all_messages, classroom_details = classroom_details)
-        elif app.method == "POST":
-            message = app.form_data["message"]
-            live_message = LiveMessages(liveclassID=live_class.liveclassID, userID=user.userID, content=message)
-            live_message.send_message(sql_database)
-            return redirect("/classrooms/{}/live".format(live_class.liveclassID))
-        else:
-            return error(405)
-app.route("join_live_class", join_live_class)
+
+# def join_live_class(classID):
+#     ret_code, user = validate_login(app.headers)
+#     if(ret_code == 0):
+#         return user
+#     else:
+#         live_class = LiveClass(classID=classID)
+#         if_live = live_class.check_if_live(sql_database)
+#         if not if_live:
+#             return error(400, "The class has not started yet.")
+#         if app.method == "GET":
+#             live_messages = LiveMessages(liveclassID=live_class.liveclassID)
+#             live_messages.get_all_messages(sql_database)
+#             classroom_details = Classroom(classID=classID).get_class_details(sql_database)
+#             return render_html("live_class.html", messages = live_messages.all_messages, userID=user.userID, classroom_details = classroom_details)
+#         elif app.method == "POST":
+#             message = app.form_data["message"]
+#             live_message = LiveMessages(liveclassID=live_class.liveclassID, userID=user.userID, content=message)
+#             live_message.send_message(sql_database)
+#             return redirect("/classrooms/{}/live".format(classID))
+#         else:
+#             return error(405)
+# app.route("join_live_class", join_live_class)
 
 def discussions(class_id):
     ret_code, user = validate_login(app.headers)
     if(ret_code == 0):
         return user
     else:
-        joined_classes = user.list_classrooms(sql_database)
-        class_ids = [joined_class.classID for joined_class in joined_classes]
-        if class_id not in class_ids:
-            return error(200, "You are not a part of this classroom")
-        classroom_obj = Classroom(classID=class_id)
-        for joined_class in joined_classes:
-            if joined_class.classID == class_id:
-                classroom_obj = joined_class
-                break
-        print("class ID is:", class_id)
-        
+        ret_code, classroom_obj = validate_classroom(class_id, user)
+        if(ret_code == 0):
+            return classroom_obj
+        # print("class ID is:", class_id)
         if app.method == "POST":
             if(user.userID == classroom_obj.creator_userID):
                 form_data = app.form_data
@@ -228,14 +248,15 @@ def discussions(class_id):
             gd_list = []
             for gd in group_discussions:
                 gd_list.append({"gdID":gd.gdID, "classID":gd.classID, "gd_topic":gd.gd_topic})
-            username = user.name
+            user_details = {"name": user.name, "userID": user.userID}
             classroom_details = {}
             classroom_details = {"classID": classroom_obj.classID}
             classroom_details["creator_name"] = classroom_obj.get_creator_name(sql_database=sql_database)[0][0]
             classroom_details["creator_userID"] = classroom_obj.creator_userID
             classroom_details["name"] = classroom_obj.name
             classroom_details["description"] = classroom_obj.description
-            return render_html("group_discussions.html", gd_list=gd_list, username = username, details=classroom_details)
+            if_class_live = LiveClass(classID=classroom_obj.classID).check_if_live(sql_database)
+            return render_html("group_discussions.html", gd_list=gd_list, user_details = user_details, details=classroom_details, if_class_live = if_class_live)
 app.route("discussions", discussions)
 
 
