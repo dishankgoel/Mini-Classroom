@@ -52,7 +52,12 @@ class Handler():
                 return app.routes["access_classroom"](class_id)
             elif(args[3] == "live"):
                 return app.routes["join_live_class"](class_id)
-
+            elif args[3]=="group_discussions":
+                if len(args)==4:
+                    return app.routes["discussions"](class_id)
+                else:
+                    gdID = int(self.path.split("/")[4])
+                    return app.routes["access_discussion"](gdID)
             # except:
             # return error(404)
 

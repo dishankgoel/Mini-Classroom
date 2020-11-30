@@ -196,3 +196,49 @@ def join_live_class(classID):
         else:
             return error(405)
 app.route("join_live_class", join_live_class)
+
+def discussions(class_id):
+    ret_code, user = validate_login(app.headers)
+    if(ret_code == 0):
+        return user
+    else:
+        joined_classes = user.list_classrooms(sql_database)
+        class_ids = [joined_class.classID for joined_class in joined_classes]
+        if class_id not in class_ids:
+            return error(200, "You are not a part of this classroom")
+        classroom_obj = Classroom(classID=class_id)
+        for joined_class in joined_classes:
+            if joined_class.classID == class_id:
+                classroom_obj = joined_class
+                break
+        print("class ID is:", class_id)
+        
+        if app.method == "POST":
+            if(user.userID == classroom_obj.creator_userID):
+                form_data = app.form_data
+                gd_topic = form_data["gd_topic"]
+                gd = Group_discussion(classID=classroom_obj.classID, gdID=None, gd_topic=gd_topic)
+                gd.add_gd(sql_database)
+                print("classroom_obj", classroom_obj)
+                return redirect("/classrooms/{}/group_discussions".format(class_id))
+            else:
+                return error(200, "You are not a Instructor. Only instructors can create a Group Discussion on Classroom")
+        else:
+            group_discussions = classroom_obj.get_group_discussions(sql_database)
+            gd_list = []
+            for gd in group_discussions:
+                gd_list.append({"gdID":gd.gdID, "classID":gd.classID, "gd_topic":gd.gd_topic})
+            username = user.name
+            classroom_details = {}
+            classroom_details = {"classID": classroom_obj.classID}
+            classroom_details["creator_name"] = classroom_obj.get_creator_name(sql_database=sql_database)[0][0]
+            classroom_details["creator_userID"] = classroom_obj.creator_userID
+            classroom_details["name"] = classroom_obj.name
+            classroom_details["description"] = classroom_obj.description
+            return render_html("group_discussions.html", gd_list=gd_list, username = username, details=classroom_details)
+app.route("discussions", discussions)
+
+
+def access_discussion(gdID):
+    pass
+app.route("access_discussion", access_discussion)

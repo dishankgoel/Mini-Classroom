@@ -1,0 +1,19 @@
+<html>
+    <body>
+        <p style="text-align:right;">{{username}}</p>
+        <h1>Classroom name: {{details.name}}</h1>
+        <h2>Group Discussions:</h2>
+        <form action="/classrooms/{{details.classID}}/group_discussions" method="POST">
+            <div class="form-group">
+              <label for="gd_topic">Group Discussion Topic:</label>
+              <input type="text" class="form-control" id="gd_topic" placeholder="Enter Topic of The Group Discuddion" name="gd_topic">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        {% for gd in gd_list %}
+            <a href="/classrooms/{{details.classID}}/group_discussions/{{gd.gdID}}">{{gd["gd_topic"]}}</a>
+            <hr>
+        {% endfor %}
+        test text
+    </body>
+</html>

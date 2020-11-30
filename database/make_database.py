@@ -66,7 +66,23 @@ make_live_messages = '''CREATE TABLE LiveMessages (
 )'''
 
 
-sql_queries = [make_classrooms, make_posts, make_users, make_tags, make_classroom_user_role, make_live_classes, make_live_messages]
+make_group_discussions = '''CREATE TABLE GroupDiscussions (
+    gdID INT AUTO_INCREMENT PRIMARY KEY,
+    classID INT,
+    gdTopic VARCHAR(100)    
+)'''
+
+make_gd_messages = '''CREATE TABLE GDMessages (
+    msgID INT AUTO_INCREMENT PRIMARY KEY,
+    gdID INT,
+    sender_userID INT,
+    timestamp DATE,
+    private INT,
+    content VARCHAR(100)
+)'''
+
+sql_queries = [make_classrooms, make_posts, make_users, make_tags, make_classroom_user_role, make_group_discussions, make_gd_messages, make_live_classes, make_live_messages]
+
 
 for query in sql_queries:
     dbcursor.execute(query)

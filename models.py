@@ -2,6 +2,7 @@ import hashlib
 
 def joining_code_from_id(classID):
     return hashlib.md5(bytes(str(classID), "utf-8")).hexdigest()[:8]
+    
 class Classroom:
     def __init__(self, classID=None, creator_userID=None, name=None, description=None, joining_code = None):
         self.classID = classID
@@ -54,6 +55,16 @@ class Classroom:
         for post in posts:
             posts_list.append(Post(postID=post[0], classID=post[1], timestamp=post[2], creator_userID=post[3], content=post[4]))
         return posts_list
+
+    def get_group_discussions(self, sql_database):
+        sql = "SELECT * from GroupDiscussions WHERE classID = %s"
+        db_cursor = sql_database.cursor()
+        db_cursor.execute(sql, (self.classID,))
+        gds = db_cursor.fetchall()
+        gd_list = []
+        for gd in gds:
+            gd_list.append(Group_discussion(gdID=gd[0], classID=gd[1], gd_topic=gd[2]))
+        return gd_list
 
     def get_creator_name(self, sql_database):
         db_cursor = sql_database.cursor()
@@ -214,7 +225,6 @@ class LiveClass:
         self.classID = classID
     
     def check_if_live(self, sql_database):
-        
         db_cursor = sql_database.cursor()
         sql = '''SELECT * FROM LiveClass WHERE classID = %s'''
         db_cursor.execute(sql, (self.classID,))
@@ -278,4 +288,28 @@ class LiveMessages:
         db_cursor.close()
 
 
-        
+class Group_discussion:
+    def __init__(self, classID, gdID, gd_topic):
+        self.gdID = gdID
+        self.classID = classID
+        self.gd_topic = gd_topic
+
+    def add_gd(self, sql_database):
+        db_cursor = sql_database.cursor()
+        sql = '''INSERT INTO GroupDiscussions (gdID, classID, gdTopic) VALUES (%s, %s, %s)'''
+        val = (self.gdID, self.classID, self.gd_topic)
+        db_cursor.execute(sql, val)
+        sql_database.commit()
+        db_cursor.close()
+
+    def get_messages(self, sql_database):
+        pass
+
+class GD_message:
+    def __init__(self, msgID, gdID, sender_userID, timestamp, private, content):
+        self.msgID = msgID
+        self.gdID = gdID
+        self.sender_userID = sender_userID
+        self.timestamp = timestamp
+        self.private = private
+        self.content = content
