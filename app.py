@@ -10,7 +10,7 @@ app_secret = '^gr05fr78^&tr3vr'
 
 DB_HOST = "localhost"
 DB_USER = "root"
-DB_PASS = "Proj@Py19"
+DB_PASS = "root"
 
 sql_database = mysql.connector.connect(
     host = DB_HOST,
@@ -43,6 +43,20 @@ def validate_classroom(classID, user):
             classroom_obj = joined_class
             break
     return 1, classroom_obj
+
+def user_json(user):
+    user_details = {}
+    user_details["username"] = user.name
+    user_details["userID"] = user.userID
+    return user_details
+
+def classroom_json(classroom_obj):
+    classroom_details = {"classID": classroom_obj.classID}
+    classroom_details["creator_name"] = classroom_obj.get_creator_name(sql_database=sql_database)[0][0]
+    classroom_details["creator_userID"] = classroom_obj.creator_userID
+    classroom_details["name"] = classroom_obj.name
+    classroom_details["description"] = classroom_obj.description
+    return classroom_details
 
 
 def hello():
@@ -90,10 +104,11 @@ def classrooms():
         return user
     else:
         joined_classes = user.list_classrooms(sql_database)
+        user_details = user_json(user)
         classroom_data = []
         for joined_class in joined_classes:
             classroom_data.append({"name": joined_class.name, "description": joined_class.description, "classid": joined_class.classID, "code": joined_class.joining_code, "userid": user.userID, "creatorid": joined_class.creator_userID})
-        return render_html("classrooms.html", classrooms = classroom_data)
+        return render_html("classrooms.html", classrooms = classroom_data, user_details = user_details)
 app.route("/classrooms", classrooms)
 
 
@@ -119,22 +134,42 @@ def access_classroom(class_id):
                 return error(200, "You are not a Instructor. Only instructors can post on Classroom")
         else:
             posts = classroom_obj.list_posts(sql_database=sql_database)
-            user_details = {}
-            user_details["username"] = user.name
-            user_details["userID"] = user.userID
-            classroom_details = {"classID": classroom_obj.classID}
-            classroom_details["creator_name"] = classroom_obj.get_creator_name(sql_database=sql_database)[0][0]
-            classroom_details["creator_userID"] = classroom_obj.creator_userID
-            classroom_details["name"] = classroom_obj.name
-            classroom_details["description"] = classroom_obj.description
+            user_details = user_json(user)
+            classroom_details = classroom_json(classroom_obj)
             post_list = []
             for post in posts:
                 tag_name = post.get_tag(sql_database)
                 post_list.append({"postID":post.postID, "classID":post.classID, "timestamp":post.timestamp, "creator_userID":post.creator_userID, "content":post.content, "tag":tag_name})
             
             if_class_live = LiveClass(classID=classroom_obj.classID).check_if_live(sql_database)
-            return render_html("class.html", posts=post_list, details=classroom_details, user_details = user_details, if_class_live = if_class_live)
+            return render_html("class.html", posts=post_list[::-1], details=classroom_details, user_details = user_details, if_class_live = if_class_live)
 app.route("access_classroom", access_classroom)
+
+def categorized_posts(class_id):
+    ret_code, user = validate_login(app.headers)
+    if(ret_code == 0):
+        return user
+    else:
+        ret_code, classroom_obj = validate_classroom(class_id, user)
+        if(ret_code == 0):
+            return classroom_obj
+        posts = classroom_obj.list_posts(sql_database=sql_database)
+        post_dict = {}
+        for post in posts:
+            tag_name = post.get_tag(sql_database)
+            if tag_name not in post_dict:
+                post_dict[tag_name] = [{"postID":post.postID, "classID":post.classID, "timestamp":post.timestamp, "creator_userID":post.creator_userID, "content":post.content, "tag":tag_name}]
+            else:
+                post_dict[tag_name].append({"postID":post.postID, "classID":post.classID, "timestamp":post.timestamp, "creator_userID":post.creator_userID, "content":post.content, "tag":tag_name})
+        post_list = []
+        for tag_name in post_dict:
+            post_list.append({"tag": tag_name, "sorted_posts": post_dict[tag_name]})
+        user_details = user_json(user)
+        classroom_details = classroom_json(classroom_obj)
+        if_class_live = LiveClass(classID=classroom_obj.classID).check_if_live(sql_database)
+        return render_html("posts_by_tag.html", posts=post_list, details=classroom_details, user_details = user_details, if_class_live = if_class_live)
+
+app.route("categorize", categorized_posts)
 
 def access_students(class_id):
     ret_code, user = validate_login(app.headers)
@@ -146,7 +181,10 @@ def access_students(class_id):
             return classroom_obj
         if(user.userID == classroom_obj.creator_userID):
             students_list = classroom_obj.list_students(sql_database)
-            return render_html("students.html", students_list = students_list)
+            user_details = user_json(user)
+            classroom_details = classroom_json(classroom_obj)
+            if_class_live = LiveClass(classID=classroom_obj.classID).check_if_live(sql_database)
+            return render_html("students.html", students_list = students_list, details=classroom_details, user_details = user_details, if_class_live = if_class_live)
         else:
             return error(200, "You are not an Instructor. Only instructors can view list of students in the Classroom")
 app.route("access_students", access_students)
@@ -222,14 +260,18 @@ def join_live_class(classID):
         return user
     else:
         if app.method == "GET":
+            ret_code, classroom_obj = validate_classroom(classID, user)
+            if(ret_code == 0):
+                return classroom_obj
             live_class = LiveClass(classID=classID)
             if_live = live_class.check_if_live(sql_database)
             if not if_live:
                 return error(400, "The class has not started yet.")
             user_attendance = Attendance(liveclassID=live_class.liveclassID, userID=user.userID)
             user_attendance.mark_attendance(sql_database)
+            user_details = user_json(user)
             classroom_details = Classroom(classID=classID).get_class_details(sql_database)
-            return render_html("live_class.html", live_class = live_class, userID = user.userID, classroom_details=classroom_details, user_attendance = user_attendance)
+            return render_html("live_class.html", live_class = live_class, user_attendance = user_attendance, user_details=user_details, details=classroom_details, if_class_live = if_live)
         else:
             return error(405)
 app.route("join_live_class", join_live_class)
@@ -258,13 +300,8 @@ def discussions(class_id):
             gd_list = []
             for gd in group_discussions:
                 gd_list.append({"gdID":gd.gdID, "classID":gd.classID, "gd_topic":gd.gd_topic})
-            user_details = {"name": user.name, "userID": user.userID}
-            classroom_details = {}
-            classroom_details = {"classID": classroom_obj.classID}
-            classroom_details["creator_name"] = classroom_obj.get_creator_name(sql_database=sql_database)[0][0]
-            classroom_details["creator_userID"] = classroom_obj.creator_userID
-            classroom_details["name"] = classroom_obj.name
-            classroom_details["description"] = classroom_obj.description
+            user_details = user_json(user)
+            classroom_details = classroom_json(classroom_obj)
             if_class_live = LiveClass(classID=classroom_obj.classID).check_if_live(sql_database)
             return render_html("group_discussions.html", gd_list=gd_list, user_details = user_details, details=classroom_details, if_class_live = if_class_live)
 app.route("discussions", discussions)
@@ -275,15 +312,9 @@ def access_discussion(gdID, class_id):
     if(ret_code == 0):
         return user
     else:
-        joined_classes = user.list_classrooms(sql_database)
-        class_ids = [joined_class.classID for joined_class in joined_classes]
-        if class_id not in class_ids:
-            return error(200, "You are not a part of this classroom")
-        classroom_obj = Classroom(classID=class_id)
-        for joined_class in joined_classes:
-            if joined_class.classID == class_id:
-                classroom_obj = joined_class
-                break
+        ret_code, classroom_obj = validate_classroom(class_id, user)
+        if(ret_code == 0):
+            return classroom_obj
         gd_list = classroom_obj.get_group_discussions(sql_database)
         gd_obj = None
         gdIDs = [gd.gdID for gd in gd_list]
@@ -296,29 +327,24 @@ def access_discussion(gdID, class_id):
         instructor = (user.userID == classroom_obj.creator_userID)
         print("GD_ID is - ", gd_obj.gdID)
         if app.method == "POST":
-            receiver = None
-            private_msg = None
-            public_msg = None
             form_data = app.form_data
-            if "receiver" in form_data.keys():
-                receiver = form_data["receiver"]
-            if "private_msg" in form_data.keys():
-                private_msg = form_data["private_msg"]
-            if "public_msg" in form_data.keys():
-                public_msg = form_data["public_msg"]
-            if public_msg != None:
-                public_msg_obj = GD_message(gdID=gd_obj.gdID, sender_userID=user.userID, private=-1, content=public_msg)
-                public_msg_obj.add_msg(sql_database)
-            if instructor:
-                if private_msg != None:
-                    if receiver != None:
-                        private_msg_obj = GD_message(gdID=gd_obj.gdID, sender_userID=user.userID, private=receiver, content=private_msg)
-                        private_msg_obj.add_msg(sql_database)
-                    else:
-                        return error(200, "No receiver for private message")
-            else:
+            private = form_data["if_private"]
+            if(private == "1"):
+                # Private message
+                if instructor:
+                    studentID = form_data["receiver"]
+                    private_msg = form_data["private_msg"]
+                    private_msg_obj = GD_message(gdID=gd_obj.gdID, sender_userID=user.userID, private=studentID, content=private_msg)
+                    private_msg_obj.add_msg(sql_database)
+                else:
+                    private_msg = form_data["private_msg"]
                     private_msg_obj = GD_message(gdID=gd_obj.gdID, sender_userID=user.userID, private=classroom_obj.creator_userID, content=private_msg)
                     private_msg_obj.add_msg(sql_database)
+            else:
+                # Public message
+                public_msg = form_data["public_msg"]
+                public_msg_obj = GD_message(gdID=gd_obj.gdID, sender_userID=user.userID, private=-1, content=public_msg)
+                public_msg_obj.add_msg(sql_database)
             return redirect("/classrooms/{}/group_discussions/{}".format(class_id, gd_obj.gdID))
 
         else:
@@ -330,6 +356,7 @@ def access_discussion(gdID, class_id):
                 receiver_tmp_obj = User(userID = priv_msg["private"])
                 priv_msg["recvname"] = receiver_tmp_obj.get_name_of_user(sql_database)
                 priv_msg["username"] = username_tmp
+                priv_msg["senderID"] = priv_msg["private"]
             for pub_msg in public_list:
                 user_tmp_obj = User(userID = pub_msg["sender_userID"])
                 username_tmp = user_tmp_obj.get_name_of_user(sql_database)
@@ -345,6 +372,9 @@ def access_discussion(gdID, class_id):
                 for priv_msg in tmp_private_list:
                     if priv_msg["sender_userID"] == user.userID or priv_msg["private"] == user.userID:
                         private_list.append(priv_msg)
-            return render_html("discussion.html", private_list = private_list, public_list = public_list, is_instructor = instructor, gd_topic=gd_obj.gd_topic, classroom_name = classroom_obj.name, username = user.name, class_id = classroom_obj.classID, gdID = gd_obj.gdID)
+            user_details = user_json(user)
+            classroom_details = classroom_json(classroom_obj)
+            if_class_live = LiveClass(classID=classroom_obj.classID).check_if_live(sql_database)
+            return render_html("discussion.html", private_list = private_list, public_list = public_list, is_instructor = instructor, gd_topic=gd_obj.gd_topic, gdID = gd_obj.gdID, user_details = user_details, details=classroom_details, if_class_live = if_class_live)
         
 app.route("access_discussion", access_discussion)

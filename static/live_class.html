@@ -6,15 +6,12 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Jekyll v4.1.1">
-    <title>Live Class - {{ classroom_details.name }}</title>
+    <title>Live Class - {{ details.name }}</title>
 
     <!-- <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/offcanvas/"> -->
 
     <!-- Bootstrap core CSS -->
 <link href="/static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-<link href="/static/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-<script src="/static/vendor/jquery/jquery.min.js"></script>
-<script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- <link rel="stylesheet" type="text/css" href="/static/vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css">
 <script type="text/javascript" src="/static/vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.js"></script> -->
 <!-- <link rel="stylesheet" type="text/css" href="/static/css/chat.css"> -->
@@ -40,48 +37,59 @@
   </head>
   <body class="bg-light">
     <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
-  <a class="navbar-brand mr-auto mr-lg-0" href="/classrooms/{{classroom_details.classID}}">{{classroom_details.name}}</a>
-  <button class="navbar-toggler p-0 border-0" type="button" data-toggle="offcanvas">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-  <div class="navbar-collapse offcanvas-collapse" id="navbarsExampleDefault">
-    <ul class="navbar-nav mr-auto">
-      <!-- <li class="nav-item active">
-        <a class="nav-link" href="#">{{classroom_details.name}}<span class="sr-only">(current)</span></a>
-      </li> -->
-      <li class="nav-item">
-        <a class="nav-link" href="/classrooms/{{classroom_details.classID}}/group_discussions">View Discussions</a>
-	  </li>
-	  {% if classroom_details.creator_userID|int() == userID|int() %}
-		<li class="nav-item">
-			<!-- <a class="nav-link" href="#">Join Classroom</a> -->
-			<form class="form-inline" action="/end_class" method="POST">
-				<div class="form-group">
-					<input type="hidden" class="form-control" id="classID" name="classID" value="{{classroom_details.classID}}">
-				</div>
-				<button type="submit" class="btn btn-primary">End the class</button>
-			</form>
-		</li>
-      {% endif %}
-      <li class="nav-item">
-        <a class="nav-link" href="/logout">Logout</a>
-      </li>
-      <!-- <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Settings</a>
-        <div class="dropdown-menu" aria-labelledby="dropdown01">
-          <a class="dropdown-item" href="#">Action</a>
-          <a class="dropdown-item" href="#">Another action</a>
-          <a class="dropdown-item" href="#">Something else here</a>
-        </div>
-      </li> -->
-    </ul>
-    <!-- <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-    </form> -->
-  </div>
-</nav>
+      <a class="navbar-brand mr-auto mr-lg-0" href="/classrooms/{{details.classID}}">{{details.name}}</a>
+      <button class="navbar-toggler p-0 border-0" type="button" data-toggle="offcanvas">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    
+      <div class="navbar-collapse offcanvas-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <!-- <li class="nav-item active">
+            <a class="nav-link" href="#">{{details.name}}<span class="sr-only">(current)</span></a>
+          </li> -->
+          <li class="nav-item">
+            <a class="nav-link" href="/classrooms">Your Classrooms</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/classrooms/{{details.classID}}/group_discussions">View Discussions</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/classrooms/{{details.classID}}/categorized">Categorized Posts</a>
+          </li>      
+          {% if details.creator_userID|int() == user_details.userID|int() %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Manage Classroom</a>
+              <div class="dropdown-menu" aria-labelledby="dropdown01">
+                <a class="dropdown-item" href="/classrooms/{{details.classID}}/students">Students List</a>
+                <a class="dropdown-item" href="#">View Attendance</a>
+              </div>
+            </li>
+          {% endif %}
+          {% if if_class_live|int() == 1 %}
+            <li class="nav-item active">
+              <a class="nav-link" href="/classrooms/{{details.classID}}/live">Join live class</a>
+            </li>
+          {% endif %}
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">Logout</a>
+          </li>
+        </ul>
+        {% if details.creator_userID|int() == user_details.userID|int() %}
+            {% if if_class_live|int() == 1 %}
+                    <!-- <a class="nav-link" href="#">Join Classroom</a> -->
+              <form class="form-inline" action="/end_class" method="POST">
+                  <div class="form-group">
+                      <input type="hidden" class="form-control" id="classID" name="classID" value="{{details.classID}}">
+                  </div>
+                  <button type="submit" class="btn btn-primary my-2 my-sm-0">End the live class</button>
+              </form>
+            {% endif %}
+          {% endif %}
+          <span class="navbar-text pl-4">
+            Logged In: {{ user_details.username }}
+          </span>
+      </div>
+    </nav>
 <!-- 
 <div class="nav-scroller bg-white shadow-sm">
   <nav class="nav nav-underline">
@@ -99,17 +107,17 @@
     <a class="nav-link" href="#">Link</a>
   </nav>
 </div> -->
-<!-- <h1>Classroom name: {{classroom_details.name}}</h1>
-        <h2>Created by: {{classroom_details.creator_name}}</h2>
-        <p>{{classroom_details.description}}</p> -->
+<!-- <h1>Classroom name: {{details.name}}</h1>
+        <h2>Created by: {{details.creator_name}}</h2>
+        <p>{{details.description}}</p> -->
 
 <main role="main" class="container">
   <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-purple rounded shadow-sm">
     <img class="mr-3" src="/static/img/class_icon.png" alt="" width="48" height="48">
     <div class="lh-100">
-      <h6 class="mb-0 text-white lh-100">{{ classroom_details.name }}</h6>
-      <p>{{classroom_details.description}}</p>
-      <small>Created by: {{classroom_details.creator_name}}</small>
+      <h6 class="mb-0 text-white lh-100">{{ details.name }}</h6>
+      <p>{{details.description}}</p>
+      <small>Created by: {{details.creator_name}}</small>
     </div>
   </div>
 

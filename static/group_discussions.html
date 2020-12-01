@@ -1,22 +1,3 @@
-<!-- <html>
-    <body>
-        <p style="text-align:right;">{{username}}</p>
-        <h1>Classroom name: {{details.name}}</h1>
-        <h2>Group Discussions:</h2>
-        <form action="/classrooms/{{details.classID}}/group_discussions" method="POST">
-            <div class="form-group">
-              <label for="gd_topic">Group Discussion Topic:</label>
-              <input type="text" class="form-control" id="gd_topic" placeholder="Enter Topic of The Group Discuddion" name="gd_topic">
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-        {% for gd in gd_list %}
-            <a href="/classrooms/{{details.classID}}/group_discussions/{{gd.gdID}}">{{gd["gd_topic"]}}</a>
-            <hr>
-        {% endfor %}
-    </body>
-</html> -->
-
 <!doctype html>
 <html lang="en">
   <head>
@@ -53,53 +34,60 @@
   </head>
   <body class="bg-light">
     <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
-  <a class="navbar-brand mr-auto mr-lg-0" href="/classrooms/{{details.classID}}">{{details.name}}</a>
-  <button class="navbar-toggler p-0 border-0" type="button" data-toggle="offcanvas">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-  <div class="navbar-collapse offcanvas-collapse" id="navbarsExampleDefault">
-    <ul class="navbar-nav mr-auto">
-      <!-- <li class="nav-item active">
-        <a class="nav-link" href="#">{{details.name}}<span class="sr-only">(current)</span></a>
-      </li> -->
-      <li class="nav-item">
-        <a class="nav-link" href="/classrooms/{{details.classID}}/group_discussions">View Discussions<span class="sr-only">(current)</span></a>
-      </li>
-      {% if details.creator_userID|int() == user_details.userID|int() %}
-        {% if if_class_live|int() != 1 %}
-            <li class="nav-item">
-                <!-- <a class="nav-link" href="#">Join Classroom</a> -->
-                <form class="form-inline" action="/start_class" method="POST">
-                    <div class="form-group">
-                        <input type="hidden" class="form-control" id="classID" name="classID" value="{{details.classID}}">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Start a live class</button>
-                </form>
+      <a class="navbar-brand mr-auto mr-lg-0" href="/classrooms/{{details.classID}}">{{details.name}}</a>
+      <button class="navbar-toggler p-0 border-0" type="button" data-toggle="offcanvas">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    
+      <div class="navbar-collapse offcanvas-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <!-- <li class="nav-item active">
+            <a class="nav-link" href="#">{{details.name}}<span class="sr-only">(current)</span></a>
+          </li> -->
+          <li class="nav-item">
+            <a class="nav-link" href="/classrooms">Your Classrooms</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="/classrooms/{{details.classID}}/group_discussions">View Discussions</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/classrooms/{{details.classID}}/categorized">Categorized Posts</a>
+          </li>      
+          {% if details.creator_userID|int() == user_details.userID|int() %}
+            <!-- <li class="nav-item">
+              <a class="nav-link" href="/classrooms/{{details.classID}}/students">Students List</a>
+            </li> -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Manage Classroom</a>
+              <div class="dropdown-menu" aria-labelledby="dropdown01">
+                <a class="dropdown-item" href="/classrooms/{{details.classID}}/students">Students List</a>
+                <a class="dropdown-item" href="#">View Attendance</a>
+              </div>
             </li>
-        {% endif %}
-      {% endif %}
-      {% if if_class_live|int() == 1 %}
-        <a class="nav-link" href="/classrooms/{{details.classID}}/live">Join live class</a>
-      {% endif %}
-      <li class="nav-item">
-        <a class="nav-link" href="/logout">Logout</a>
-      </li>
-      <!-- <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Settings</a>
-        <div class="dropdown-menu" aria-labelledby="dropdown01">
-          <a class="dropdown-item" href="#">Action</a>
-          <a class="dropdown-item" href="#">Another action</a>
-          <a class="dropdown-item" href="#">Something else here</a>
-        </div>
-      </li> -->
-    </ul>
-    <!-- <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-    </form> -->
-  </div>
-</nav>
+          {% endif %}
+          {% if if_class_live|int() == 1 %}
+            <a class="nav-link" href="/classrooms/{{details.classID}}/live">Join live class</a>
+          {% endif %}
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">Logout</a>
+          </li>
+        </ul>
+        {% if details.creator_userID|int() == user_details.userID|int() %}
+            {% if if_class_live|int() != 1 %}
+                    <!-- <a class="nav-link" href="#">Join Classroom</a> -->
+              <form class="form-inline" action="/start_class" method="POST">
+                  <div class="form-group">
+                      <input type="hidden" class="form-control" id="classID" name="classID" value="{{details.classID}}">
+                  </div>
+                  <button type="submit" class="btn btn-primary my-2 my-sm-0">Start a live class</button>
+              </form>
+            {% endif %}
+          {% endif %}
+          <span class="navbar-text pl-4">
+            Logged In: {{ user_details.username }}
+          </span>
+      </div>
+    </nav>
 <!-- 
 <div class="nav-scroller bg-white shadow-sm">
   <nav class="nav nav-underline">
@@ -162,7 +150,7 @@
           <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
             <strong class="d-block text-gray-dark">{{gd.gd_topic}}</strong>
           </div>
-          <small class="d-block text-right mt-3">
+          <small class="d-block text-right mt-0">
             <a href="/classrooms/{{details.classID}}/group_discussions/{{gd.gdID}}">View Discussion</a>
           </small>
         </div>

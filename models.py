@@ -5,6 +5,7 @@ def joining_code_from_id(classID):
     
 def gen_session_code(liveclassID, userID):
     return hashlib.md5(bytes(str(liveclassID) + "::" + str(userID), "utf-8")).hexdigest()[:10]
+
 class Classroom:
     def __init__(self, classID=None, creator_userID=None, name=None, description=None, joining_code = None):
         self.classID = classID

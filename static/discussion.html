@@ -1,4 +1,4 @@
-<html>
+<!-- <html>
     <body>
         <p style="text-align:right;">{{username}}</p>
         <h1>Classroom name: {{classroom_name}}</h1>
@@ -22,7 +22,7 @@
                   <label for="private_msg">Send a private message to instructor:</label>
                   <input type="text" class="form-control" id="private_msg" placeholder="Private Message" name="private_msg">
                 </div>
-                <button type="submit" class="btn btn-primary">Send</button>
+                <button type="submit" class="btn btn-primary" name="if_private" value="1">Send</button>
             </form>
             <hr>
         <h3>Public Messages: </h3>
@@ -37,7 +37,214 @@
                   <label for="public_msg">Send a public message to the Group Discussion:</label>
                   <input type="text" class="form-control" id="public_msg" placeholder="Public Message" name="public_msg">
                 </div>
-                <button type="submit" class="btn btn-primary">Send</button>
+                <button type="submit" class="btn btn-primary" name="if_private" value="0">Send</button>
             </form>
     </body>
+</html> -->
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Jekyll v4.1.1">
+    <title>{{ details.name }}</title>
+
+    <!-- <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/offcanvas/"> -->
+
+    <!-- Bootstrap core CSS -->
+<link href="/static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+    <!-- Custom styles for this template -->
+    <link href="/static/css/offcanvas.css" rel="stylesheet">
+  </head>
+  <body class="bg-light">
+    <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
+  <a class="navbar-brand mr-auto mr-lg-0" href="/classrooms/{{details.classID}}">{{details.name}}</a>
+  <button class="navbar-toggler p-0 border-0" type="button" data-toggle="offcanvas">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="navbar-collapse offcanvas-collapse" id="navbarsExampleDefault">
+    <ul class="navbar-nav mr-auto">
+      <!-- <li class="nav-item active">
+        <a class="nav-link" href="#">{{details.name}}<span class="sr-only">(current)</span></a>
+      </li> -->
+      <li class="nav-item">
+        <a class="nav-link" href="/classrooms">Your Classrooms</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/classrooms/{{details.classID}}/group_discussions">View Discussions</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/classrooms/{{details.classID}}/categorized">Categorized Posts</a>
+      </li>      
+      {% if details.creator_userID|int() == user_details.userID|int() %}
+        <li class="nav-item">
+          <a class="nav-link" href="/classrooms/{{details.classID}}/students">Students List</a>
+        </li>
+        {% if if_class_live|int() != 1 %}
+            <li class="nav-item">
+                <!-- <a class="nav-link" href="#">Join Classroom</a> -->
+                <form class="form-inline my-2 my-lg-0" action="/start_class" method="POST">
+                    <div class="form-group">
+                        <input type="hidden" class="form-control" id="classID" name="classID" value="{{details.classID}}">
+                    </div>
+                    <button type="submit" class="btn btn-primary my-2 my-sm-0">Start a live class</button>
+                </form>
+            </li>
+        {% endif %}
+      {% endif %}
+      {% if if_class_live|int() == 1 %}
+        <a class="nav-link" href="/classrooms/{{details.classID}}/live">Join live class</a>
+      {% endif %}
+      <li class="nav-item">
+        <a class="nav-link" href="/logout">Logout</a>
+      </li>
+      <!-- <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Settings</a>
+        <div class="dropdown-menu" aria-labelledby="dropdown01">
+          <a class="dropdown-item" href="#">Action</a>
+          <a class="dropdown-item" href="#">Another action</a>
+          <a class="dropdown-item" href="#">Something else here</a>
+        </div>
+      </li> -->
+    </ul>
+    <!-- <form class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form> -->
+  </div>
+</nav>
+<!-- 
+<div class="nav-scroller bg-white shadow-sm">
+  <nav class="nav nav-underline">
+    <a class="nav-link active" href="#">Dashboard</a>
+    <a class="nav-link" href="#">
+      Friends
+      <span class="badge badge-pill bg-light align-text-bottom">27</span>
+    </a>
+    <a class="nav-link" href="#">Explore</a>
+    <a class="nav-link" href="#">Suggestions</a>
+    <a class="nav-link" href="#">Link</a>
+    <a class="nav-link" href="#">Link</a>
+    <a class="nav-link" href="#">Link</a>
+    <a class="nav-link" href="#">Link</a>
+    <a class="nav-link" href="#">Link</a>
+  </nav>
+</div> -->
+<!-- <h1>Classroom name: {{details.name}}</h1>
+        <h2>Created by: {{details.creator_name}}</h2>
+        <p>{{details.description}}</p> -->
+
+<main role="main" class="container">
+  <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-purple rounded shadow-sm">
+    <img class="mr-3" src="/static/img/class_icon.png" alt="" width="48" height="48">
+    <div class="lh-100">
+      <h6 class="mb-0 text-white lh-100">{{ details.name }}</h6>
+      <p>{{details.description}}</p>
+      <small>Created by: {{details.creator_name}}</small>
+    </div>
+  </div>
+  <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-success rounded shadow-sm">
+    <img class="mr-3" src="/static/img/class_icon.png" alt="" width="48" height="48">
+    <div class="lh-100">
+      <h6 class="mb-0 text-white lh-100">Discussion Topic: {{gd_topic}}</h6>
+    </div>
+  </div>
+  <div class="my-3 p-3 bg-white rounded shadow-sm">
+    <h6 class="border-bottom border-gray pb-2 mb-0">Private Messages</h6>
+    {% if private_list %}
+      {% for priv in private_list %}
+        <div class="media pt-3">
+          <svg class="bd-placeholder-img mr-2 rounded" width="16" height="16" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32"><title>Placeholder</title><rect width="100%" height="100%" fill="#9000ff"/><text x="50%" y="50%" fill="#9000ff" dy=".3em">32x32</text></svg>
+          <div class="media-body pb-0 mb-0 lh-125 border-bottom border-gray">
+            <strong class="d-block text-gray-dark small">(ID: {{priv.senderID}}) {{priv.username}} -> {{priv.recvname}}</strong>
+            <p class="mb-2 pt-1 small">{{priv.content}}</p>
+            <p class="text-muted small">Posted: {{priv.timestamp}}</p>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="media text-muted pt-3">There are no private messages in this discussion</div>
+    {% endif %}
+    <div class="media pt-3">
+        <svg class="bd-placeholder-img mr-2 rounded" width="16" height="16" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 16x16"><title>Placeholder</title><rect width="100%" height="100%" fill="#9000ff"/><text x="50%" y="50%" fill="#9000ff" dy=".3em">16x16</text></svg>
+        <div class="media-body pb-3 small mb-0 lh-125 border-bottom border-gray">
+            <strong class="d-block text-gray-dark">Send a private message</strong>
+            <form class="form-inline" action="/classrooms/{{class_id}}/group_discussions/{{gdID}}" method="POST">
+                {% if is_instructor %}
+                    <div class="form-group col-auto row">
+                        <label class="col-sm-4 col-form-label" for="receiver">ID of User to reply: </label>
+                        <div class="col-sm-2">
+                            <input type="number" class="form-control-sm border-0" id="receiver" name="receiver"></input>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="form-group col-auto row">
+                    <label class="col-sm-4 col-form-label" for="private_msg">A private message:</label>
+                    <div class="col-sm-8">
+                        <textarea type="text" class="form-control border-0" id="private_msg" name="private_msg"></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" name="if_private" value="1">Send</button>
+            </form>
+        </div>
+      </div>
+  </div>
+  <div class="my-3 p-3 bg-white rounded shadow-sm">
+    <h6 class="border-bottom border-gray pb-2 mb-0">Public Messages</h6>
+    {% if public_list %}
+      {% for pub in public_list %}
+        <div class="media pt-3">
+          <svg class="bd-placeholder-img mr-2 rounded" width="16" height="16" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 16x16"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"/><text x="50%" y="50%" fill="#007bff" dy=".3em">16x16</text></svg>
+          <div class="media-body pb-0 mb-0 small lh-125 border-bottom border-gray">
+            <strong class="d-block text-gray-dark">{{pub.username}}</strong>
+            <p class="mb-2 pt-1">{{pub.content}}</p>
+            <p class="text-muted">Posted: {{pub.timestamp}}</p>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="media text-muted pt-3">There are no public messages in this discussion</div>
+    {% endif %}
+    <div class="media pt-3">
+        <svg class="bd-placeholder-img mr-2 rounded" width="16" height="16" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 16x16"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"/><text x="50%" y="50%" fill="#007bff" dy=".3em">16x16</text></svg>
+        <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+            <strong class="d-block text-gray-dark">Send a public message</strong>
+            <form class="form-inline" action="/classrooms/{{class_id}}/group_discussions/{{gdID}}" method="POST">
+                <div class="form-group">
+                    <label class="col-sm-4 col-form-label" for="public_msg">A public message:</label>
+                    <div class="col-sm-8">
+                        <textarea type="text" class="form-control border-0" id="public_msg" name="public_msg"></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" name="if_private" value="0">Send</button>
+            </form>
+        </div>
+      </div>
+  </div>
+</main>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+      <script>window.jQuery || document.write('<script src="/static/vendor/jquery/jquery.slim.min.js"><\/script>')</script><script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script src="/static/js/offconvas.js"></script></body>
 </html>
+

@@ -40,20 +40,29 @@ def send_json(d, sock):
     sock.sendall(bytes(data, "utf-8") + b"\r\n")
 
 
-def remove_connection(connection):
+def remove_connection(connection, liveclassID):
 
-    if connection in active_clients:
-        active_clients.remove(connection)
+    if liveclassID in active_classrooms:
+        if connection in active_classrooms[liveclassID]:
+            active_classrooms[liveclassID].remove(connection)
 
-def broadcast_message(new_message, connection):
+def add_connection(connection, liveclassID):
+    if liveclassID not in active_classrooms:
+        active_classrooms[liveclassID] = [connection,]
+    else:
+        active_classrooms[liveclassID].append(connection)
 
-    for client in active_clients:
+def broadcast_message(new_message, connection, liveclassID):
+
+    for client in active_classrooms[liveclassID]:
         if client != connection:
             try:
                 send_json(new_message, client)
             except:
                 client.close()
-                remove_connection(client)
+                remove_connection(client, liveclassID)
+
+
 class RequestThread(Thread):
 
     def __init__(self, sock, addr, buffer_size):
@@ -85,15 +94,16 @@ class RequestThread(Thread):
                 send_json({"allowaccess": "0"}, self.sock)
             else:
                 send_json({"allowaccess": "1"}, self.sock)
+                add_connection(self.sock, user_attendance.liveclassID)
                 while True:
                     try:
                         # new_message = self.sock.recv(self.buffer_size)
                         new_message = get_json(self.sock)
                         if new_message:
                             # name, content = new_message["name"], new_message["content"]
-                            broadcast_message(new_message, self.sock)
+                            broadcast_message(new_message, self.sock, user_attendance.liveclassID)
                         else:
-                            remove_connection(self.sock)
+                            remove_connection(self.sock, user_attendance.liveclassID)
                     except:
                         continue
 
@@ -112,11 +122,10 @@ server_sock.bind((ip, port))
 server_sock.listen(100)
 print("[*] Chat Server Started on Port: ", port)
 
-active_clients = []
+active_classrooms = {}
 
 while True:
     conn, addr = server_sock.accept()
-    active_clients.append(conn)
     new_request = RequestThread(conn, addr, buffer_size)
     new_request.start()
 

@@ -60,6 +60,8 @@ class Handler():
                     return app.routes["access_discussion"](gdID, class_id)
             elif args[3]=="students":
                 return app.routes["access_students"](class_id)
+            elif args[3] == "categorized":
+                return app.routes["categorize"](class_id)
             # except:
             # return error(404)
 

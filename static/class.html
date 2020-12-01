@@ -1,41 +1,3 @@
-<!-- <html>
-    <body>
-        <p style="text-align:right;">{{user_details.username}}</p>
-        <h1>Classroom name: {{details.name}}</h1>
-        <h2>Created by: {{details.creator_name}}</h2>
-        <p>{{details.description}}</p>
-        <a href="/classrooms/{{details.classID}}/group_discussions" class="btn btn-primary stretched-link">Go to Group Discussions</a>
-        <hr>
-        {% if details.creator_userID|int() == user_details.userID|int() %}
-            {% if if_class_live|int() != 1 %}
-                <form action="/start_class" method="POST">
-                    <div class="form-group">
-                        <input type="hidden" class="form-control" id="classID" name="classID" value="{{details.classID}}">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Start a live class</button>
-                </form>
-            {% endif %}
-            <form action="" method="POST">
-                <div class="form-group">
-                    <label for="content">Content:</label>
-                    <input type="text" class="form-control" id="content" placeholder="Enter content" name="content">
-                </div>
-                <div class="form-group">
-                    <label for="tag">Tag:</label>
-                    <input type="text" class="form-control" id="tag" placeholder="Enter tag" name="tag">
-                </div>
-                <button type="submit" class="btn btn-primary">Post</button>
-            </form>
-        {% endif %}
-        {% for post in posts %}
-            <h3> {{post.timestamp}} </h3>
-            <h3> Tag: {{post.tag}} </h3>
-            <p> {{post.content}} </p>
-            <hr>
-        {% endfor %}
-    </body>
-</html> -->
-
 <!doctype html>
 <html lang="en">
   <head>
@@ -83,23 +45,25 @@
         <a class="nav-link" href="#">{{details.name}}<span class="sr-only">(current)</span></a>
       </li> -->
       <li class="nav-item">
+        <a class="nav-link" href="/classrooms">Your Classrooms</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link" href="/classrooms/{{details.classID}}/group_discussions">View Discussions</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/classrooms/{{details.classID}}/students">Students List</a>
-      </li>
+        <a class="nav-link" href="/classrooms/{{details.classID}}/categorized">Categorized Posts</a>
+      </li>      
       {% if details.creator_userID|int() == user_details.userID|int() %}
-        {% if if_class_live|int() != 1 %}
-            <li class="nav-item">
-                <!-- <a class="nav-link" href="#">Join Classroom</a> -->
-                <form class="form-inline" action="/start_class" method="POST">
-                    <div class="form-group">
-                        <input type="hidden" class="form-control" id="classID" name="classID" value="{{details.classID}}">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Start a live class</button>
-                </form>
-            </li>
-        {% endif %}
+        <!-- <li class="nav-item">
+          <a class="nav-link" href="/classrooms/{{details.classID}}/students">Students List</a>
+        </li> -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Manage Classroom</a>
+          <div class="dropdown-menu" aria-labelledby="dropdown01">
+            <a class="dropdown-item" href="/classrooms/{{details.classID}}/students">Students List</a>
+            <a class="dropdown-item" href="#">View Attendance</a>
+          </div>
+        </li>
       {% endif %}
       {% if if_class_live|int() == 1 %}
         <a class="nav-link" href="/classrooms/{{details.classID}}/live">Join live class</a>
@@ -107,41 +71,23 @@
       <li class="nav-item">
         <a class="nav-link" href="/logout">Logout</a>
       </li>
-      <!-- <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Settings</a>
-        <div class="dropdown-menu" aria-labelledby="dropdown01">
-          <a class="dropdown-item" href="#">Action</a>
-          <a class="dropdown-item" href="#">Another action</a>
-          <a class="dropdown-item" href="#">Something else here</a>
-        </div>
-      </li> -->
     </ul>
-    <!-- <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-    </form> -->
+    {% if details.creator_userID|int() == user_details.userID|int() %}
+        {% if if_class_live|int() != 1 %}
+                <!-- <a class="nav-link" href="#">Join Classroom</a> -->
+          <form class="form-inline" action="/start_class" method="POST">
+              <div class="form-group">
+                  <input type="hidden" class="form-control" id="classID" name="classID" value="{{details.classID}}">
+              </div>
+              <button type="submit" class="btn btn-primary my-2 my-sm-0">Start a live class</button>
+          </form>
+        {% endif %}
+      {% endif %}
+      <span class="navbar-text pl-4">
+        Logged In: {{ user_details.username }}
+      </span>
   </div>
 </nav>
-<!-- 
-<div class="nav-scroller bg-white shadow-sm">
-  <nav class="nav nav-underline">
-    <a class="nav-link active" href="#">Dashboard</a>
-    <a class="nav-link" href="#">
-      Friends
-      <span class="badge badge-pill bg-light align-text-bottom">27</span>
-    </a>
-    <a class="nav-link" href="#">Explore</a>
-    <a class="nav-link" href="#">Suggestions</a>
-    <a class="nav-link" href="#">Link</a>
-    <a class="nav-link" href="#">Link</a>
-    <a class="nav-link" href="#">Link</a>
-    <a class="nav-link" href="#">Link</a>
-    <a class="nav-link" href="#">Link</a>
-  </nav>
-</div> -->
-<!-- <h1>Classroom name: {{details.name}}</h1>
-        <h2>Created by: {{details.creator_name}}</h2>
-        <p>{{details.description}}</p> -->
 
 <main role="main" class="container">
   <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-purple rounded shadow-sm">
@@ -152,41 +98,16 @@
       <small>Created by: {{details.creator_name}}</small>
     </div>
   </div>
-
-  <!-- {% if classrooms %}
-      {% for class in classrooms %}
-        <div class="card">
-          {% if class.creatorid|int() == class.userid|int() %}
-            <div class="card-header">
-              Joining code: {{class.code}}
-            </div>
-          {% endif %}
-          <div class="card-body">
-            <h5 class="card-title">{{class.name}}</h5>
-            <p class="card-text">{{class.description}}</p>
-            <a href="/classrooms/{{class.classid}}" class="btn btn-primary stretched-link">Go to Class</a>
-          </div>
-        </div>
-      {% endfor %}
-    {% else %}
-        <div>You have not joined any classes. Click join class to join one Now!</div>
-    {% endif %} -->
-    <!-- {% for post in posts %}
-    <h3> {{post.timestamp}} </h3>
-    <h3> Tag: {{post.tag}} </h3>
-    <p> {{post.content}} </p>
-    <hr>
-{% endfor %} -->
   <div class="my-3 p-3 bg-white rounded shadow-sm">
     <h6 class="border-bottom border-gray pb-2 mb-0">Classroom Posts</h6>
     {% if posts %}
       {% for post in posts %}
-        <div class="media text-muted pt-3">
+        <div class="media pt-3">
           <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"/><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text></svg>
-          <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+          <div class="media-body pb-0 mb-0 small lh-125 border-bottom border-gray">
             <strong class="d-block text-gray-dark">@{{post.tag}}</strong>
-            <p>{{post.content}}</p>
-            <p>Created: {{post.timestamp}}</p>
+            <p class="pt-2">{{post.content}}</p>
+            <p class="text-muted pt-0">Created: {{post.timestamp}}</p>
           </div>
         </div>
       {% endfor %}
@@ -194,17 +115,6 @@
       <div class="media text-muted pt-3">There are no posts in this classroom</div>
     {% endif %}
   </div>
-  <!-- <form action="" method="POST">
-    <div class="form-group">
-        <label for="content">Content:</label>
-        <input type="text" class="form-control" id="content" placeholder="Enter content" name="content">
-    </div>
-    <div class="form-group">
-        <label for="tag">Tag:</label>
-        <input type="text" class="form-control" id="tag" placeholder="Enter tag" name="tag">
-    </div>
-    <button type="submit" class="btn btn-primary">Post</button>
-</form> -->
   {% if details.creator_userID|int() == user_details.userID|int() %}
     <div class="my-3 p-3 bg-white rounded shadow-sm">
         <h6 class="border-bottom border-gray pb-2 mb-0">Add a New post</h6>
@@ -234,30 +144,6 @@
         </div>
     </div>
   {% endif %}
-    <!-- <div class="media text-muted pt-3">
-      <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"/><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text></svg>
-      <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
-        <div class="d-flex justify-content-between align-items-center w-100">
-          <strong class="text-gray-dark">Full Name</strong>
-          <a href="#">Follow</a>
-        </div>
-        <span class="d-block">@username</span>
-      </div>
-    </div>
-    <div class="media text-muted pt-3">
-      <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"/><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text></svg>
-      <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
-        <div class="d-flex justify-content-between align-items-center w-100">
-          <strong class="text-gray-dark">Full Name</strong>
-          <a href="#">Follow</a>
-        </div>
-        <span class="d-block">@username</span>
-      </div>
-    </div>
-    <small class="d-block text-right mt-3">
-      <a href="#">All suggestions</a>
-    </small> -->
-  </div>
 </main>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
       <script>window.jQuery || document.write('<script src="/static/vendor/jquery/jquery.slim.min.js"><\/script>')</script><script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
