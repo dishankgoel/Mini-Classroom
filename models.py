@@ -3,6 +3,8 @@ import hashlib
 def joining_code_from_id(classID):
     return hashlib.md5(bytes(str(classID), "utf-8")).hexdigest()[:8]
     
+def gen_session_code(liveclassID, userID):
+    return hashlib.md5(bytes(str(liveclassID) + "::" + str(userID), "utf-8")).hexdigest()[:10]
 class Classroom:
     def __init__(self, classID=None, creator_userID=None, name=None, description=None, joining_code = None):
         self.classID = classID
@@ -221,10 +223,11 @@ class Classroom_user_role:
 
 class LiveClass:
 
-    def __init__(self, liveclassID=None, classID=None):
+    def __init__(self, liveclassID=None, classID=None, timestamp = None):
 
         self.liveclassID = liveclassID
         self.classID = classID
+        self.timestamp = timestamp
     
     def check_if_live(self, sql_database):
         db_cursor = sql_database.cursor()
@@ -234,6 +237,7 @@ class LiveClass:
         db_cursor.close()
         if(len(results) > 0):
             self.liveclassID = results[0][0]
+            self.timestamp = results[0][2]
             return 1
         return 0
 
@@ -250,51 +254,59 @@ class LiveClass:
             return 1
         return 0
     
-    # def end_class(self, sql_database):
+    def end_class(self, sql_database):
 
-    #     db_cursor = sql_database.cursor()
-    #     sql = '''DELETE FROM LiveClass WHERE classID = %s'''
-    #     db_cursor.execute(sql, (self.classID,))
-    #     sql_database.commit()
-    #     sql = '''DELETE FROM LiveMessages WHERE liveclassID = %s'''
-    #     db_cursor.execute(sql, (self.liveclassID))
-    #     sql_database.commit()
-    #     db_cursor.close()
-    #     return 1
-        
-# class LiveMessages:
+        db_cursor = sql_database.cursor()
+        sql = '''DELETE FROM LiveClass WHERE classID = %s'''
+        db_cursor.execute(sql, (self.classID,))
+        sql_database.commit()
+        sql_database.commit()
+        db_cursor.close()
+        return 1
 
-#     def __init__(self, livemessageID = None, liveclassID = None, userID = None, content = None, timestamp = None):
+class Attendance:
 
-#         self.livemessageID = livemessageID
-#         self.liveclassID = liveclassID
-#         self.userID = userID
-#         self.content = content
-#         self.timestamp = timestamp
-#         self.all_messages = []
+    def __init__(self, attendaceID = None, liveclassID = None, userID = None, sessionID = None, timestamp = None):
 
-#     def get_all_messages(self, sql_database):
+        self.attendaceID = attendaceID
+        self.liveclassID = liveclassID
+        self.userID = userID
+        self.sessionID = sessionID
+        self.timestamp = timestamp
 
-#         db_cursor = sql_database.cursor()
-#         sql = '''SELECT * from LiveMessages WHERE liveclassID = %s'''
-#         db_cursor.execute(sql, (self.liveclassID,))
-#         results = db_cursor.fetchall()
-#         for result in results:
-#             userid, content, timestamp = result[2], result[3], result[4]
-#             name = User(userID=userid).get_name_of_user(sql_database)
-#             data = {"name": name, "content": content, "timestamp": timestamp}
-#             self.all_messages.append(data)
+    def mark_attendance(self, sql_database):
 
-#     def send_message(self, sql_database):
+        db_cursor = sql_database.cursor()
+        self.sessionID = gen_session_code(self.liveclassID, self.userID)
+        sql = '''SELECT * from Attendance WHERE liveclassID = %s AND userID = %s'''
+        val = (self.liveclassID, self.userID)
+        db_cursor.execute(sql, val)
+        results = db_cursor.fetchall()
+        if(len(results) == 0):
+            sql = '''INSERT INTO Attendance (liveclassID, userID, sessionID) VALUES (%s, %s, %s)'''
+            val = (self.liveclassID, self.userID, self.sessionID)
+            db_cursor.execute(sql, val)
+            sql_database.commit()
+        db_cursor.close()
 
-#         db_cursor = sql_database.cursor()
-#         sql = '''INSERT INTO LiveMessages (liveclassID, userID, content) VALUES (%s, %s, %s)'''
-#         val = (self.liveclassID, self.userID, self.content)
-#         db_cursor.execute(sql, val)
-#         sql_database.commit()
-#         db_cursor.close()
+    def validate_sessionID(self, sql_database):
 
-
+        db_cursor = sql_database.cursor()
+        sql = '''SELECT * FROM Attendance WHERE sessionID = %s'''
+        db_cursor.execute(sql, (self.sessionID, )) 
+        results = db_cursor.fetchall()
+        if(len(results) == 0):
+            return 0
+        self.liveclassID = results[0][1] 
+        self.userID = results[0][2]
+        self.timestamp = results[0][4]
+        db_cursor.execute('''SELECT * from LiveClass WHERE liveclassID = %s''', (self.liveclassID, ))
+        results = db_cursor.fetchall()
+        db_cursor.close()
+        if(len(results) == 0):
+            return 0
+        return 1
+    
 class Group_discussion:
     def __init__(self, classID=None, gdID=None, gd_topic=None):
         self.gdID = gdID

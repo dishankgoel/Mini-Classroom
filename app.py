@@ -184,45 +184,40 @@ def start_classroom_session():
             return error(405)
 app.route("/start_class", start_classroom_session)
 
-# def end_classroom_session():
-#     ret_code, user = validate_login(app.headers)
-#     if(ret_code == 0):
-#         return user
-#     else:
-#         if(app.method == "POST"):
-#             classID = app.form_data["classID"]
-#             live_class = LiveClass(classID=classID)
-#             if_live = live_class.check_if_live(sql_database)
-#             if if_live:
-#                 status = live_class.end_class(sql_database)
-#             return redirect("/classrooms/{}".format(classID))
-#         else:
-#             return error(405)
-# app.route("/end_class", end_classroom_session)
+def end_classroom_session():
+    ret_code, user = validate_login(app.headers)
+    if(ret_code == 0):
+        return user
+    else:
+        if(app.method == "POST"):
+            classID = app.form_data["classID"]
+            live_class = LiveClass(classID=classID)
+            if_live = live_class.check_if_live(sql_database)
+            if if_live:
+                status = live_class.end_class(sql_database)
+            return redirect("/classrooms/{}".format(classID))
+        else:
+            return error(405)
+app.route("/end_class", end_classroom_session)
 
 
-# def join_live_class(classID):
-#     ret_code, user = validate_login(app.headers)
-#     if(ret_code == 0):
-#         return user
-#     else:
-#         live_class = LiveClass(classID=classID)
-#         if_live = live_class.check_if_live(sql_database)
-#         if not if_live:
-#             return error(400, "The class has not started yet.")
-#         if app.method == "GET":
-#             live_messages = LiveMessages(liveclassID=live_class.liveclassID)
-#             live_messages.get_all_messages(sql_database)
-#             classroom_details = Classroom(classID=classID).get_class_details(sql_database)
-#             return render_html("live_class.html", messages = live_messages.all_messages, userID=user.userID, classroom_details = classroom_details)
-#         elif app.method == "POST":
-#             message = app.form_data["message"]
-#             live_message = LiveMessages(liveclassID=live_class.liveclassID, userID=user.userID, content=message)
-#             live_message.send_message(sql_database)
-#             return redirect("/classrooms/{}/live".format(classID))
-#         else:
-#             return error(405)
-# app.route("join_live_class", join_live_class)
+def join_live_class(classID):
+    ret_code, user = validate_login(app.headers)
+    if(ret_code == 0):
+        return user
+    else:
+        if app.method == "GET":
+            live_class = LiveClass(classID=classID)
+            if_live = live_class.check_if_live(sql_database)
+            if not if_live:
+                return error(400, "The class has not started yet.")
+            user_attendance = Attendance(liveclassID=live_class.liveclassID, userID=user.userID)
+            user_attendance.mark_attendance(sql_database)
+            classroom_details = Classroom(classID=classID).get_class_details(sql_database)
+            return render_html("live_class.html", live_class = live_class, userID = user.userID, classroom_details=classroom_details, user_attendance = user_attendance)
+        else:
+            return error(405)
+app.route("join_live_class", join_live_class)
 
 def discussions(class_id):
     ret_code, user = validate_login(app.headers)

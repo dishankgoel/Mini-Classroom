@@ -16,6 +16,7 @@ dbcursor.execute("CREATE DATABASE MiniClassroom")
 
 dbcursor.execute("use MiniClassroom")
 
+
 make_classrooms = '''CREATE TABLE Classrooms (
     classID INT AUTO_INCREMENT PRIMARY KEY, 
     creator_userID INT,
@@ -54,7 +55,8 @@ make_classroom_user_role = '''CREATE TABLE ClassUserRole (
 
 make_live_classes = '''CREATE TABLE LiveClass (
     liveclassID INT AUTO_INCREMENT PRIMARY KEY,
-    classID INT
+    classID INT,
+    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 )'''
 
 # make_live_messages = '''CREATE TABLE LiveMessages (
@@ -64,7 +66,13 @@ make_live_classes = '''CREATE TABLE LiveClass (
 #     content TEXT,
 #     timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 # )'''
-
+make_attendance = '''CREATE TABLE Attendance(
+    attendanceID INT AUTO_INCREMENT PRIMARY KEY,
+    liveclassID INT,
+    userID INT,
+    sessionID VARCHAR(100),
+    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+)'''
 
 make_group_discussions = '''CREATE TABLE GroupDiscussions (
     gdID INT AUTO_INCREMENT PRIMARY KEY,
@@ -82,7 +90,7 @@ make_gd_messages = '''CREATE TABLE GDMessages (
     content VARCHAR(100)
 )'''
 
-sql_queries = [make_classrooms, make_posts, make_users, make_tags, make_classroom_user_role, make_group_discussions, make_gd_messages, make_live_classes]
+sql_queries = [make_classrooms, make_posts, make_users, make_tags, make_classroom_user_role, make_group_discussions, make_gd_messages, make_live_classes, make_attendance]
 
 
 for query in sql_queries:
