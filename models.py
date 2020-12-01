@@ -76,6 +76,20 @@ class Classroom:
         db_cursor.close()
         return creator_name
 
+    def list_students(self, sql_database):
+        sql = "SELECT userID from ClassUserRole where ClassID = %s AND role != %s"
+        db_cursor = sql_database.cursor()
+        db_cursor.execute(sql, (self.classID,0))
+        students_list = db_cursor.fetchall()
+        student_info = []
+        db_cursor.close()
+        for student_tup in students_list:
+            studentID = student_tup[0]
+            student_obj = User(userID=studentID)
+            student_name = student_obj.get_name_of_user(sql_database=sql_database)
+            student_info.append({"userID": studentID, "Name": student_name})
+        return student_info
+
 class Post:
     def __init__(self, postID=None, classID=None, timestamp=None, creator_userID=None, content=None):
         self.postID = postID

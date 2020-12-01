@@ -10,7 +10,7 @@ app_secret = '^gr05fr78^&tr3vr'
 
 DB_HOST = "localhost"
 DB_USER = "root"
-DB_PASS = "root"
+DB_PASS = "Proj@Py19"
 
 sql_database = mysql.connector.connect(
     host = DB_HOST,
@@ -135,6 +135,21 @@ def access_classroom(class_id):
             if_class_live = LiveClass(classID=classroom_obj.classID).check_if_live(sql_database)
             return render_html("class.html", posts=post_list, details=classroom_details, user_details = user_details, if_class_live = if_class_live)
 app.route("access_classroom", access_classroom)
+
+def access_students(class_id):
+    ret_code, user = validate_login(app.headers)
+    if(ret_code == 0):
+        return user
+    else:
+        ret_code, classroom_obj = validate_classroom(class_id, user)
+        if(ret_code == 0):
+            return classroom_obj
+        if(user.userID == classroom_obj.creator_userID):
+            students_list = classroom_obj.list_students(sql_database)
+            return render_html("students.html", students_list = students_list)
+        else:
+            return error(200, "You are not an Instructor. Only instructors can view list of students in the Classroom")
+app.route("access_students", access_students)
 
 def create_classroom():
     if app.method == "GET":
