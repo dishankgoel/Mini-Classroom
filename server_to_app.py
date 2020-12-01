@@ -58,6 +58,8 @@ class Handler():
                 else:
                     gdID = int(self.path.split("/")[4])
                     return app.routes["access_discussion"](gdID, class_id)
+            elif args[3]=="students":
+                return app.routes["access_students"](class_id)
             # except:
             # return error(404)
 
