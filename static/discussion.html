@@ -11,7 +11,7 @@
                 {{priv.content}}
                 <br>
             {% endfor %}
-            <form action="/classrooms/{{class_id}}/group_discussions/{{gdID}}" method="POST">
+            <form action="/classrooms/{{details.classID}}/group_discussions/{{gdID}}" method="POST">
                 {% if is_instructor %}
                     <div class="form-group">
                         <label for="receiver">Enter UserID of private message receiver:</label>
@@ -32,7 +32,7 @@
                 {{pub.content}}
                 <br>
             {% endfor %}
-            <form action="/classrooms/{{class_id}}/group_discussions/{{gdID}}" method="POST">
+            <form action="/classrooms/{{details.classID}}/group_discussions/{{gdID}}" method="POST">
                 <div class="form-group">
                   <label for="public_msg">Send a public message to the Group Discussion:</label>
                   <input type="text" class="form-control" id="public_msg" placeholder="Public Message" name="public_msg">
@@ -78,62 +78,60 @@
   </head>
   <body class="bg-light">
     <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
-  <a class="navbar-brand mr-auto mr-lg-0" href="/classrooms/{{details.classID}}">{{details.name}}</a>
-  <button class="navbar-toggler p-0 border-0" type="button" data-toggle="offcanvas">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-  <div class="navbar-collapse offcanvas-collapse" id="navbarsExampleDefault">
-    <ul class="navbar-nav mr-auto">
-      <!-- <li class="nav-item active">
-        <a class="nav-link" href="#">{{details.name}}<span class="sr-only">(current)</span></a>
-      </li> -->
-      <li class="nav-item">
-        <a class="nav-link" href="/classrooms">Your Classrooms</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/classrooms/{{details.classID}}/group_discussions">View Discussions</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/classrooms/{{details.classID}}/categorized">Categorized Posts</a>
-      </li>      
-      {% if details.creator_userID|int() == user_details.userID|int() %}
-        <li class="nav-item">
-          <a class="nav-link" href="/classrooms/{{details.classID}}/students">Students List</a>
-        </li>
-        {% if if_class_live|int() != 1 %}
-            <li class="nav-item">
-                <!-- <a class="nav-link" href="#">Join Classroom</a> -->
-                <form class="form-inline my-2 my-lg-0" action="/start_class" method="POST">
-                    <div class="form-group">
-                        <input type="hidden" class="form-control" id="classID" name="classID" value="{{details.classID}}">
-                    </div>
-                    <button type="submit" class="btn btn-primary my-2 my-sm-0">Start a live class</button>
-                </form>
+      <a class="navbar-brand mr-auto mr-lg-0" href="/classrooms/{{details.classID}}">{{details.name}}</a>
+      <button class="navbar-toggler p-0 border-0" type="button" data-toggle="offcanvas">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    
+      <div class="navbar-collapse offcanvas-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <!-- <li class="nav-item active">
+            <a class="nav-link" href="#">{{details.name}}<span class="sr-only">(current)</span></a>
+          </li> -->
+          <li class="nav-item">
+            <a class="nav-link" href="/classrooms">Your Classrooms</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/classrooms/{{details.classID}}/group_discussions">View Discussions</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/classrooms/{{details.classID}}/categorized">Categorized Posts</a>
+          </li>      
+          {% if details.creator_userID|int() == user_details.userID|int() %}
+            <!-- <li class="nav-item">
+              <a class="nav-link" href="/classrooms/{{details.classID}}/students">Students List</a>
+            </li> -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Manage Classroom</a>
+              <div class="dropdown-menu" aria-labelledby="dropdown01">
+                <a class="dropdown-item" href="/classrooms/{{details.classID}}/students">Students List</a>
+                <a class="dropdown-item" href="/classrooms/{{details.classID}}/attendance">View Attendance</a>
+              </div>
             </li>
-        {% endif %}
-      {% endif %}
-      {% if if_class_live|int() == 1 %}
-        <a class="nav-link" href="/classrooms/{{details.classID}}/live">Join live class</a>
-      {% endif %}
-      <li class="nav-item">
-        <a class="nav-link" href="/logout">Logout</a>
-      </li>
-      <!-- <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Settings</a>
-        <div class="dropdown-menu" aria-labelledby="dropdown01">
-          <a class="dropdown-item" href="#">Action</a>
-          <a class="dropdown-item" href="#">Another action</a>
-          <a class="dropdown-item" href="#">Something else here</a>
-        </div>
-      </li> -->
-    </ul>
-    <!-- <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-    </form> -->
-  </div>
-</nav>
+          {% endif %}
+          {% if if_class_live|int() == 1 %}
+            <a class="nav-link" href="/classrooms/{{details.classID}}/live">Join live class</a>
+          {% endif %}
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">Logout</a>
+          </li>
+        </ul>
+        {% if details.creator_userID|int() == user_details.userID|int() %}
+            {% if if_class_live|int() != 1 %}
+                    <!-- <a class="nav-link" href="#">Join Classroom</a> -->
+              <form class="form-inline" action="/start_class" method="POST">
+                  <div class="form-group">
+                      <input type="hidden" class="form-control" id="classID" name="classID" value="{{details.classID}}">
+                  </div>
+                  <button type="submit" class="btn btn-primary my-2 my-sm-0">Start a live class</button>
+              </form>
+            {% endif %}
+          {% endif %}
+          <span class="navbar-text pl-4">
+            Logged In: {{ user_details.username }}
+          </span>
+      </div>
+    </nav>
 <!-- 
 <div class="nav-scroller bg-white shadow-sm">
   <nav class="nav nav-underline">
@@ -174,7 +172,7 @@
     <h6 class="border-bottom border-gray pb-2 mb-0">Private Messages</h6>
     {% if private_list %}
       {% for priv in private_list %}
-        <div class="media pt-3">
+        <div class="media pt-2">
           <svg class="bd-placeholder-img mr-2 rounded" width="16" height="16" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32"><title>Placeholder</title><rect width="100%" height="100%" fill="#9000ff"/><text x="50%" y="50%" fill="#9000ff" dy=".3em">32x32</text></svg>
           <div class="media-body pb-0 mb-0 lh-125 border-bottom border-gray">
             <strong class="d-block text-gray-dark small">(ID: {{priv.senderID}}) {{priv.username}} -> {{priv.recvname}}</strong>
@@ -186,11 +184,11 @@
     {% else %}
       <div class="media text-muted pt-3">There are no private messages in this discussion</div>
     {% endif %}
-    <div class="media pt-3">
+    <div class="media pt-2">
         <svg class="bd-placeholder-img mr-2 rounded" width="16" height="16" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 16x16"><title>Placeholder</title><rect width="100%" height="100%" fill="#9000ff"/><text x="50%" y="50%" fill="#9000ff" dy=".3em">16x16</text></svg>
-        <div class="media-body pb-3 small mb-0 lh-125 border-bottom border-gray">
+        <div class="media-body pb-0 small mb-0 lh-125 border-bottom border-gray">
             <strong class="d-block text-gray-dark">Send a private message</strong>
-            <form class="form-inline" action="/classrooms/{{class_id}}/group_discussions/{{gdID}}" method="POST">
+            <form class="form-inline" action="/classrooms/{{details.classID}}/group_discussions/{{gdID}}" method="POST">
                 {% if is_instructor %}
                     <div class="form-group col-auto row">
                         <label class="col-sm-4 col-form-label" for="receiver">ID of User to reply: </label>
@@ -214,7 +212,7 @@
     <h6 class="border-bottom border-gray pb-2 mb-0">Public Messages</h6>
     {% if public_list %}
       {% for pub in public_list %}
-        <div class="media pt-3">
+        <div class="media pt-2">
           <svg class="bd-placeholder-img mr-2 rounded" width="16" height="16" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 16x16"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"/><text x="50%" y="50%" fill="#007bff" dy=".3em">16x16</text></svg>
           <div class="media-body pb-0 mb-0 small lh-125 border-bottom border-gray">
             <strong class="d-block text-gray-dark">{{pub.username}}</strong>
@@ -230,7 +228,7 @@
         <svg class="bd-placeholder-img mr-2 rounded" width="16" height="16" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 16x16"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"/><text x="50%" y="50%" fill="#007bff" dy=".3em">16x16</text></svg>
         <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
             <strong class="d-block text-gray-dark">Send a public message</strong>
-            <form class="form-inline" action="/classrooms/{{class_id}}/group_discussions/{{gdID}}" method="POST">
+            <form class="form-inline" action="/classrooms/{{details.classID}}/group_discussions/{{gdID}}" method="POST">
                 <div class="form-group">
                     <label class="col-sm-4 col-form-label" for="public_msg">A public message:</label>
                     <div class="col-sm-8">

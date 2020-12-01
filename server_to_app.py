@@ -62,6 +62,8 @@ class Handler():
                 return app.routes["access_students"](class_id)
             elif args[3] == "categorized":
                 return app.routes["categorize"](class_id)
+            elif args[3] == "attendance":
+                return app.routes["attendance"](class_id)
             # except:
             # return error(404)
 

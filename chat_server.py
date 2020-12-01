@@ -88,7 +88,7 @@ class RequestThread(Thread):
             data = {"loggedIn": "1", "name": name}
             send_json(data, self.sock)
             session_code = get_json(self.sock)["session_code"]
-            user_attendance = Attendance(sessionID = session_code)
+            user_attendance = Attendance(sessionID = session_code, userID=user_id)
             ret = user_attendance.validate_sessionID(sql_database)
             if(ret == 0):
                 send_json({"allowaccess": "0"}, self.sock)

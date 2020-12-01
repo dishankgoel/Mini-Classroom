@@ -92,6 +92,35 @@ class Classroom:
             student_name = student_obj.get_name_of_user(sql_database=sql_database)
             student_info.append({"userID": studentID, "Name": student_name})
         return student_info
+    
+    def get_attendance(self, sql_database):
+        db_cursor = sql_database.cursor()
+        sql = '''SELECT * FROM Attendance WHERE classID = %s'''
+        db_cursor.execute(sql, (self.classID, ))
+        results = db_cursor.fetchall()
+        db_cursor.close()
+        all_students = self.list_students(sql_database)
+        classes_attended = {}
+        names = {}
+        for student in all_students:
+            classes_attended[student["userID"]] = set()
+            names[student["userID"]] = student["Name"]
+        total_classes = set()
+        for attendance in results:
+            liveclassID = attendance[1]
+            total_classes.add(liveclassID)
+            user_id = attendance[2]
+            if user_id != self.creator_userID:
+                classes_attended[user_id].add(liveclassID)
+        final_tally = []
+        total_classes_len = len(total_classes)
+        for user_id in classes_attended:
+            attended = len(classes_attended[user_id])
+            data = {"name": names[user_id], "total": total_classes_len, "attended": attended}
+            final_tally.append(data)
+        final_tally.sort(key=lambda x: x["attended"])
+        return final_tally
+
 
 class Post:
     def __init__(self, postID=None, classID=None, timestamp=None, creator_userID=None, content=None):
@@ -281,11 +310,12 @@ class LiveClass:
 
 class Attendance:
 
-    def __init__(self, attendaceID = None, liveclassID = None, userID = None, sessionID = None, timestamp = None):
+    def __init__(self, attendaceID = None, liveclassID = None, userID = None, classID = None, sessionID = None, timestamp = None):
 
         self.attendaceID = attendaceID
         self.liveclassID = liveclassID
         self.userID = userID
+        self.classID = classID
         self.sessionID = sessionID
         self.timestamp = timestamp
 
@@ -298,8 +328,8 @@ class Attendance:
         db_cursor.execute(sql, val)
         results = db_cursor.fetchall()
         if(len(results) == 0):
-            sql = '''INSERT INTO Attendance (liveclassID, userID, sessionID) VALUES (%s, %s, %s)'''
-            val = (self.liveclassID, self.userID, self.sessionID)
+            sql = '''INSERT INTO Attendance (liveclassID, userID, classID, sessionID) VALUES (%s, %s, %s, %s)'''
+            val = (self.liveclassID, self.userID, self.classID, self.sessionID)
             db_cursor.execute(sql, val)
             sql_database.commit()
         db_cursor.close()
@@ -313,7 +343,9 @@ class Attendance:
         if(len(results) == 0):
             return 0
         self.liveclassID = results[0][1] 
-        self.userID = results[0][2]
+        code_userID = results[0][2]
+        if(code_userID != self.userID):
+            return 0
         self.timestamp = results[0][4]
         db_cursor.execute('''SELECT * from LiveClass WHERE liveclassID = %s''', (self.liveclassID, ))
         results = db_cursor.fetchall()

@@ -7,7 +7,7 @@ ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';
 conn = mysql.connector.connect(
     host = "localhost",
     user = "root",
-    password = "Proj@Py19"
+    password = "root"
 )
 
 dbcursor = conn.cursor()
@@ -59,17 +59,11 @@ make_live_classes = '''CREATE TABLE LiveClass (
     timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 )'''
 
-# make_live_messages = '''CREATE TABLE LiveMessages (
-#     livemessageID INT AUTO_INCREMENT PRIMARY KEY,
-#     liveclassID INT,
-#     userID INT,
-#     content TEXT,
-#     timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-# )'''
 make_attendance = '''CREATE TABLE Attendance(
     attendanceID INT AUTO_INCREMENT PRIMARY KEY,
     liveclassID INT,
     userID INT,
+    classID INT,
     sessionID VARCHAR(100),
     timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 )'''

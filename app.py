@@ -267,7 +267,7 @@ def join_live_class(classID):
             if_live = live_class.check_if_live(sql_database)
             if not if_live:
                 return error(400, "The class has not started yet.")
-            user_attendance = Attendance(liveclassID=live_class.liveclassID, userID=user.userID)
+            user_attendance = Attendance(liveclassID=live_class.liveclassID, userID=user.userID, classID = classroom_obj.classID)
             user_attendance.mark_attendance(sql_database)
             user_details = user_json(user)
             classroom_details = Classroom(classID=classID).get_class_details(sql_database)
@@ -275,6 +275,24 @@ def join_live_class(classID):
         else:
             return error(405)
 app.route("join_live_class", join_live_class)
+
+def show_attendace(classID):
+    ret_code, user = validate_login(app.headers)
+    if(ret_code == 0):
+        return user
+    else:
+        if app.method == "GET":
+            ret_code, classroom_obj = validate_classroom(classID, user)
+            if(ret_code == 0):
+                return classroom_obj
+            user_details = user_json(user)
+            attendance = classroom_obj.get_attendance(sql_database)
+            classroom_details = classroom_json(classroom_obj)
+            if_class_live = LiveClass(classID=classroom_obj.classID).check_if_live(sql_database)
+            return render_html("attendance.html", final_tally = attendance, user_details=user_details, details=classroom_details, if_class_live = if_class_live)
+        else:
+            return error(405)
+app.route("attendance", show_attendace)
 
 def discussions(class_id):
     ret_code, user = validate_login(app.headers)
@@ -356,7 +374,7 @@ def access_discussion(gdID, class_id):
                 receiver_tmp_obj = User(userID = priv_msg["private"])
                 priv_msg["recvname"] = receiver_tmp_obj.get_name_of_user(sql_database)
                 priv_msg["username"] = username_tmp
-                priv_msg["senderID"] = priv_msg["private"]
+                priv_msg["senderID"] = priv_msg["sender_userID"]
             for pub_msg in public_list:
                 user_tmp_obj = User(userID = pub_msg["sender_userID"])
                 username_tmp = user_tmp_obj.get_name_of_user(sql_database)

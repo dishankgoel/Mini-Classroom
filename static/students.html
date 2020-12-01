@@ -61,7 +61,7 @@
               <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Manage Classroom</a>
               <div class="dropdown-menu" aria-labelledby="dropdown01">
                 <a class="dropdown-item" href="/classrooms/{{details.classID}}/students">Students List</a>
-                <a class="dropdown-item" href="#">View Attendance</a>
+                <a class="dropdown-item" href="/classrooms/{{details.classID}}/attendance">View Attendance</a>
               </div>
             </li>
           {% endif %}
@@ -102,7 +102,7 @@
     {% if students_list %}
       {% for student in students_list %}
         <div class="media pt-3">
-          <!-- <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"/><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text></svg> -->
+          <svg class="bd-placeholder-img mr-2 rounded" width="20" height="20" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 20x20"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"/><text x="50%" y="50%" fill="#007bff" dy=".3em">20x20</text></svg>
           <div class="media-body pb-3 mb-0 lh-125 border-bottom border-gray">
             <strong class="d-block text-gray-dark">{{ student.Name}}</strong>
           </div>
