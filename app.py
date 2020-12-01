@@ -10,7 +10,7 @@ app_secret = '^gr05fr78^&tr3vr'
 
 DB_HOST = "localhost"
 DB_USER = "root"
-DB_PASS = "root"
+DB_PASS = "Proj@Py19"
 
 sql_database = mysql.connector.connect(
     host = DB_HOST,

@@ -135,6 +135,7 @@ class HttpParser():
 
         while not self.finish:
             data = self.get_sock_data()
+            print("request:\n", bytetostr(data))
             if not data:
                 break
             self._remaining.extend(data.split(b"\r\n"))
@@ -241,5 +242,5 @@ class HttpResponse():
         self.prepare_headers_and_body(headers, body)
 
         response = bytes(self.first_line + self.headers + "\r\n", "utf-8") + self.body
-
+        print("\n\nresponse:", bytetostr(bytes(self.first_line + self.headers + "\r\n", "utf-8")))
         self.sock.sendall(response)
