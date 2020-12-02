@@ -96,9 +96,9 @@ Bonus Features -
 
 A client in a particular Classroom can have one of the two roles - 
 1. Instructor  
-![Instructor](./images/instructor.png)  
+![Instructor](./images/instructor.PNG)  
 2. Student  
-![Student](./images/student.png)
+![Student](./images/student.PNG)
 
 ## Communication Paradigm for web application 🛰️
 
@@ -140,16 +140,16 @@ Below is the High Level Design of the App
 ## Overview of Implementation ⚙️
 
 ### HTTP Library overview 🏢-  
-![HTTP Library](./images/http_lib.png)  
+![HTTP Library](./images/http_lib.PNG)  
 
 ### Server-side overview 💻- 
-![Servers](./images/servers.png)
+![Servers](./images/servers.PNG)
 
 ### Server to Application overview 📲- 
-![Server to App](./images/server_to_app.png)
+![Server to App](./images/server_to_app.PNG)
 
 ### Database and Data Structures overview 🗄️ - 
-![Database](./images/database.png)
+![Database](./images/database.PNG)
 
 ## How To Use - 
 
@@ -175,4 +175,4 @@ Note: Edit ```./start_chat_app.sh``` for database configurations and the ip of s
 
 Intended deployment strategy is a simple tree topology, with all the clients at leaf nodes, database server connected to switch s7 at depth-0, 2 app servers and 1 chat server connected to switches at depth-1.
 
-![Deployment](./images/deployment.png)
+![Deployment](./images/deployment.PNG)
