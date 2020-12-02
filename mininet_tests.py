@@ -5,7 +5,8 @@ from mininet.net import Mininet
 from mininet.util import dumpNodeConnections
 from mininet.log import setLogLevel
 from mininet.link import TCLink
-# from mininet.topolib import TreeTopo
+from mininet.cli import CLI
+import api
 import subprocess
 import time
 
@@ -59,6 +60,8 @@ def perform_tests():
     for app_server in app_servers:
         s = net.get(app_server)
         s.popen('./start_app.sh', stdout = subprocess.PIPE)
+
+    CLI(net)
     net.stop()
 
 
