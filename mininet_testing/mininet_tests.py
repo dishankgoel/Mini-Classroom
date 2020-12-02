@@ -44,8 +44,6 @@ class TreeTopo( Topo ):
             self.hostNum += 1
         return node
 
-def for_each_client():
-    pass
 
 def perform_tests():
 
@@ -56,11 +54,23 @@ def perform_tests():
     # dumpNodeConnections(net.hosts)
     # Create the database
     # database = net.get('h37')
-    app_servers = ['h33', 'h34', 'h35', 'h36']
+    app_servers = {'h33': "", 'h34': "", 'h35': "", 'h36': ""}
     for app_server in app_servers:
         s = net.get(app_server)
-        s.popen('./start_app.sh', stdout = subprocess.PIPE)
-
+        app_servers[app_server] = s
+        s.popen('./start_app.sh', s.IP(), stdout = subprocess.PIPE)
+    instructor = net.get('h1')
+    print("[*] Creating Instructor")
+    p = instructor.popen("python3", "instructor.py", app_servers['h33'].IP(), stdout = subprocess.PIPE)
+    output, error = p.communicate()
+    p.wait()
+    print(output)
+    students = [net.get('h2'), net.get('h3'), net.get('h4')]
+    for i in range(len(students)):
+        print("[*] Creating student no: {}".format(i+1))
+        student_no = i+1
+        p = students[i].popen("python3", "student.py", students[i].IP(), student_no)
+        p.wait()
     CLI(net)
     net.stop()
 

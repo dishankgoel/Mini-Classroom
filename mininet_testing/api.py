@@ -1,6 +1,6 @@
 import requests
 import sys
-
+import re
 
 class API:
 
@@ -54,7 +54,9 @@ class API:
         url = "http://{}:{}/CreateClass".format(self.ip, self.port)
         fields = {"name":name, "description":description}
         r = s.post(url, data=fields, cookies=self.cookie)
-        return r.text
+        html = r.text
+        joining_code = re.search("Joining code:.*</p>", html).group(0).split()[-1].split('<')[0]
+        return joining_code
 
     def get_classroom_view(self, classID):
         s = self.session
@@ -97,13 +99,13 @@ class API:
         return r.text
 
 
-api = API('127.0.0.1', 12345)
+# api = API('127.0.0.1', 12345)
 # print(api.get_home_page())
 # print(api.get_login_page())
-api.post_login_credentials(email="pushkarm27@gmail.com", pwd="password")
+# api.post_login_credentials(email="pushkarm27@gmail.com", pwd="password")
 # print(api.get_classroom_view(1))
 # print(api.post_public_message(1, 1, "Yo! ssup everyone?"))
 # print(api.post_private_message(1, 1, "Hi harshit, this is from API", 2))
 # print(api.post_create_classroom("API classroom", "this was made from API"))
 # print(api.post_create_discussion(3, "API GD"))
-print(api.post_classroom_post(3, "API post number 2", "API_posts"))
+# print(api.post_classroom_post(3, "API post number 2", "API_posts"))
