@@ -8,8 +8,6 @@
     <meta name="generator" content="Jekyll v4.1.1">
     <title>{{ details.name }}</title>
 
-    <!-- <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/offcanvas/"> -->
-
     <!-- Bootstrap core CSS -->
 <link href="/static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
@@ -41,9 +39,6 @@
     
       <div class="navbar-collapse offcanvas-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">
-          <!-- <li class="nav-item active">
-            <a class="nav-link" href="#">{{details.name}}<span class="sr-only">(current)</span></a>
-          </li> -->
           <li class="nav-item">
             <a class="nav-link" href="/classrooms">Your Classrooms</a>
           </li>
@@ -54,9 +49,6 @@
             <a class="nav-link" href="/classrooms/{{details.classID}}/categorized">Categorized Posts</a>
           </li>      
           {% if details.creator_userID|int() == user_details.userID|int() %}
-            <!-- <li class="nav-item">
-              <a class="nav-link" href="/classrooms/{{details.classID}}/students">Students List</a>
-            </li> -->
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Manage Classroom</a>
               <div class="dropdown-menu" aria-labelledby="dropdown01">
@@ -74,7 +66,6 @@
         </ul>
         {% if details.creator_userID|int() == user_details.userID|int() %}
             {% if if_class_live|int() != 1 %}
-                    <!-- <a class="nav-link" href="#">Join Classroom</a> -->
               <form class="form-inline" action="/start_class" method="POST">
                   <div class="form-group">
                       <input type="hidden" class="form-control" id="classID" name="classID" value="{{details.classID}}">
@@ -88,26 +79,6 @@
           </span>
       </div>
     </nav>
-<!-- 
-<div class="nav-scroller bg-white shadow-sm">
-  <nav class="nav nav-underline">
-    <a class="nav-link active" href="#">Dashboard</a>
-    <a class="nav-link" href="#">
-      Friends
-      <span class="badge badge-pill bg-light align-text-bottom">27</span>
-    </a>
-    <a class="nav-link" href="#">Explore</a>
-    <a class="nav-link" href="#">Suggestions</a>
-    <a class="nav-link" href="#">Link</a>
-    <a class="nav-link" href="#">Link</a>
-    <a class="nav-link" href="#">Link</a>
-    <a class="nav-link" href="#">Link</a>
-    <a class="nav-link" href="#">Link</a>
-  </nav>
-</div> -->
-<!-- <h1>Classroom name: {{details.name}}</h1>
-        <h2>Created by: {{details.creator_name}}</h2>
-        <p>{{details.description}}</p> -->
 
 <main role="main" class="container">
   <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-purple rounded shadow-sm">
@@ -118,29 +89,6 @@
       <small>Created by: {{details.creator_name}}</small>
     </div>
   </div>
-
-  <!-- {% if classrooms %}
-      {% for class in classrooms %}
-        <div class="card">
-          {% if class.creatorid|int() == class.userid|int() %}
-            <div class="card-header">
-              Joining code: {{class.code}}
-            </div>
-          {% endif %}
-          <div class="card-body">
-            <h5 class="card-title">{{class.name}}</h5>
-            <p class="card-text">{{class.description}}</p>
-            <a href="/classrooms/{{class.classid}}" class="btn btn-primary stretched-link">Go to Class</a>
-          </div>
-        </div>
-      {% endfor %}
-    {% else %}
-        <div>You have not joined any classes. Click join class to join one Now!</div>
-    {% endif %} -->
-    <!-- {% for gd in gd_list %}
-    <a href="/classrooms/{{details.classID}}/group_discussions/{{gd.gdID}}">{{gd["gd_topic"]}}</a>
-    <hr>
-{% endfor %} -->
   <div class="my-3 p-3 bg-white rounded shadow-sm">
     <h6 class="border-bottom border-gray pb-2 mb-0">Discussions</h6>
     {% if gd_list %}
@@ -159,26 +107,12 @@
       <div class="media text-muted pt-3">There are no Discussions in this classroom</div>
     {% endif %}
   </div>
-
-  <!-- <form action="/classrooms/{{details.classID}}/group_discussions" method="POST">
-    <div class="form-group">
-      <label for="gd_topic">Group Discussion Topic:</label>
-      <input type="text" class="form-control" id="gd_topic" placeholder="Enter Topic of The Group Discuddion" name="gd_topic">
-    </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-</form> -->
-  
   {% if details.creator_userID|int() == user_details.userID|int() %}
     <div class="my-3 p-3 bg-white rounded shadow-sm">
         <h6 class="border-bottom border-gray pb-2 mb-0">Add a Discussion</h6>
         <div class="media text-muted pt-3">
         <!-- <svg class="bd-placeholder-img mr-2 rounded" width="32" height="32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: 32x32"><title>Placeholder</title><rect width="100%" height="100%" fill="#007bff"/><text x="50%" y="50%" fill="#007bff" dy=".3em">32x32</text></svg> -->
         <div class="media-body pb-3 mb-0 lh-125 border-bottom border-gray">
-            <!-- <div class="d-flex justify-content-between align-items-center w-100">
-            <strong class="text-gray-dark">Full Name</strong>
-            <a href="#">Follow</a>
-            </div>
-            <span class="d-block">@username</span> -->
             <form class="form" action="/classrooms/{{details.classID}}/group_discussions" method="POST">
                 <div class="form-group row">
                     <label class="col-sm-3 col-form-label" for="gd_topic">Group Discussion Topic:</label>

@@ -207,12 +207,9 @@ class User:
         results = db_cursor.fetchall()
         if(len(results) == 0):
             return []
-        # user_roles = [Classroom_user_role(classID=int(i[0]), userID=self.userID, role=int(i[2])) for i in results]
         # Query for getting all the classrooms
         values = [str(i[0]) for i in results]
         query = '''SELECT * from Classrooms where classID IN ({})'''.format(", ".join(values))
-        # for user_role in user_roles[1:]:
-        #     query += " OR classID = {}".format(user_role.classID)
         db_cursor.execute(query)
         results = db_cursor.fetchall()
         joined_classrooms = []
@@ -344,7 +341,7 @@ class Attendance:
             return 0
         self.liveclassID = results[0][1] 
         code_userID = results[0][2]
-        if(code_userID != self.userID):
+        if(int(code_userID) != int(self.userID)):
             return 0
         self.timestamp = results[0][4]
         db_cursor.execute('''SELECT * from LiveClass WHERE liveclassID = %s''', (self.liveclassID, ))

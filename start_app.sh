@@ -5,5 +5,4 @@ export DB_HOST="127.0.0.1"
 export DB_USER="root"
 export DB_PASS="root"
 # start the application server
-python3 server.py
-# Start the chat server
+python3 server.py "127.0.0.1"

@@ -1,13 +1,22 @@
 import mysql.connector
-
+import sys
 '''
 ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';
 '''
 
+'''
+Usage: python3 ./make_database.py <IP of sql server> <user> <password>
+'''
+
+
+host = sys.argv[1]
+user = sys.argv[2]
+password = sys.argv[3]
+
 conn = mysql.connector.connect(
-    host = "localhost",
-    user = "root",
-    password = "root"
+    host = host,
+    user = user,
+    password = password
 )
 
 dbcursor = conn.cursor()

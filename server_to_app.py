@@ -91,9 +91,15 @@ def error(error_code, reason = None):
     status_code = error_code
     template = env.get_template("error.html")
     if reason is not None:
-        body = template.render(error_code = error_code, reason = reason)
+        if error_code ==  404:
+            body = template.render(error_code = error_code, reason = reason)
+        else:
+            body = template.render(error_code = "", reason = reason)
     else:
-        body = template.render(error_code = error_code, reason = error_reasons[error_code])
+        if error_code == 404:
+            body = template.render(error_code = error_code, reason = error_reasons[error_code])
+        else:
+            body = template.render(error_code = "", reason = error_reasons[error_code])
         
     return status_code, headers, bytes(body, "utf-8")
 
