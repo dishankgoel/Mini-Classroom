@@ -1,15 +1,35 @@
 # Mini Classroom
 
 This project was started as a part of our CS-433 Computer Networks course at IIT Gandhinagar, and was colaboratively made by [Dishank Goel](https://github.com/dishankgoel), [Harshit Kumar](https://github.com/harshitkumar825) and [Pushkar Mujumdar](https://github.com/pmujumdar27)
+ 
+---
 
-<!-- This is a Mini Classroom tool was made to mimic the functionalities of [Google Classroom](https://classroom.google.com) along with some additional features. -->
+[Mini Classroom](#mini-classroom)
+  - [Problem Statement ❗](#problem-statement)
+  - [Directory Structure 📁](#directory-structure)
+  - [Feature Checklist ✅](#feature-checklist)
+  - [Use Cases 🕹️](#use-cases)
+  - [Communication Paradigm for web application 🛰️](#communication-paradigm-for-web-application)
+  - [Communication paradigm for Live Classroom Feature 🛰️](#communication-paradigm-for-live-classroom-feature)
+  - [App Logic 🚲](#app-logic)
+  - [Overview of Implementation ⚙️](#overview-of-implementation)
+  - [How To Use 🛠️](#how-to-use)
+  - [Deployment Strategy 🧠](#deployment-strategy)
+  - [Screenshots 📷](#screenshots)
+    - [Home Page](#home-page)
+    - [Student view for joined Classrooms](#student-view-for-joined-classrooms)
+    - [Instructor view for Classroom](#instructor-view-for-classroom)
+    - [Group Discussion view for Classroom](#group-discussion-view-for-classroom)
 
-## Problem Statement
+---
 
+## Problem Statement-
 Design and implement Mini Classroom, a simple internet tool that mimics the functionalities of [Google Classroom](https://classroom.google.com/) and some additional features. Build your application on top of TCP.
 
-## Directory Structure 📁
-<!-- run tree command and update this later -->
+---
+
+## Directory Structure 
+## 📁
 
 ```
 Mini-Classroom
@@ -55,7 +75,10 @@ Mini-Classroom
     └── students.html
 ```
 
-## Feature Checklist ✅
+---
+
+## Feature Checklist 
+## ✅
 Basic Features - 
 ```
 ✅ Any Client is able to sign up and create an account with Mini Classroom
@@ -92,7 +115,10 @@ Bonus Features -
 ✅ Live Chat and Group Chat are command line based features
 ```
 
-## Use Cases 🕹️
+---
+
+## Use Cases 
+## 🕹️
 
 A client in a particular Classroom can have one of the two roles - 
 1. Instructor  
@@ -100,7 +126,10 @@ A client in a particular Classroom can have one of the two roles -
 2. Student  
 ![Student](./images/student.PNG)
 
-## Communication Paradigm for web application 🛰️
+---
+
+## Communication Paradigm for web application 
+## 🛰️
 
 - We have Implemented HTTP protocol on top of TCP
 - Request 🔃 Response paradigm. 
@@ -125,19 +154,27 @@ A client in a particular Classroom can have one of the two roles -
    - 404 - Not Found (error response)
    - 405 - Method Not Acceptable (error response)
 
+---
 
-## Communication paradigm for Live Classroom Feature 🛰️
+## Communication paradigm for Live Classroom Feature 
+## 🛰️
 
 - Full duplex bidirectional communication.
 - The size of the JSON object is sent first, followed by the JSON object itself.
 - Whenever a client sends a message, the live-class server receives it and broadcasts it to all clients.
 
-## App Logic 🚲
+---
+
+## App Logic 
+## 🚲
 
 Below is the High Level Design of the App
 ![App logic](./images/app_logic.jpg)
 
-## Overview of Implementation ⚙️
+---
+
+## Overview of Implementation 
+## ⚙️
 
 ### HTTP Library overview 🏢-  
 ![HTTP Library](./images/http_lib.PNG)  
@@ -151,7 +188,10 @@ Below is the High Level Design of the App
 ### Database and Data Structures overview 🗄️ - 
 ![Database](./images/database.PNG)
 
-## How To Use - 
+---
+
+## How To Use 
+## 🛠️
 
 1. Make sure that all the dependencies are installed by running.   
 ``` $ pip3 install -r requirements.txt```
@@ -162,17 +202,45 @@ Go into the database/ directory. Run:
 In case of running database server on ```localhost```, the IP will be ```127.0.0.1``` and user and password as per configuration
 
 3. Deploy app server: This server is the main backend for the application. To deploy this, run  
-``` $ ./start_app.sh.```  
-Note: Edit ```./start_app.sh``` for database configurations and the ip of server if the application is not on localhost.
+``` $ ./start_app.sh <ip_of_server>```  
+Note: Edit ./start_app.sh for database configurations if the database is not on localhost.
 
 4. Deploy chat server: This server handles the live chatting and group chatting. It has a different network paradigm than app server. To deploy this, run  
-``` $ ./start_chat_app.sh```  
-Note: Edit ```./start_chat_app.sh``` for database configurations and the ip of server if the application is not on localhost.
+``` $ ./start_chat_app.sh <ip_of_server>```  
+Note: Edit ./start_chat_app.sh for database configurations if the database is not on localhost.
 
 5. The application is now ready to use. 
 
-## Deployment Strategy - 
+---
+
+## Deployment Strategy 
+## 🧠 
 
 Intended deployment strategy is a simple tree topology, with all the clients at leaf nodes, database server connected to switch s7 at depth-0, 2 app servers and 1 chat server connected to switches at depth-1.
 
 ![Deployment](./images/deployment.PNG)
+
+---
+
+## Screenshots 
+## 📷
+
+### Home Page
+![Home Page](./images/home_page.PNG)
+
+---
+
+### Student view for joined Classrooms
+![Classrooms](./images/classrooms.PNG)  
+
+---  
+  
+### Instructor view for Classroom
+![Classroom as Instructor](./images/classroom_as_instructor.PNG)  
+
+---
+
+### Group Discussion view for Classroom
+![GD as Instructor](./images/gd_instructor.PNG)  
+
+---

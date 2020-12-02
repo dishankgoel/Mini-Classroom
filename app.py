@@ -8,9 +8,13 @@ app = Interface()
 
 app_secret = '^gr05fr78^&tr3vr'
 
-DB_HOST = os.getenv("DB_HOST")
-DB_USER = os.getenv("DB_USER")
-DB_PASS = os.getenv("DB_PASS")
+# DB_HOST = os.getenv("DB_HOST")
+# DB_USER = os.getenv("DB_USER")
+# DB_PASS = os.getenv("DB_PASS")
+
+DB_HOST = "127.0.0.1"
+DB_USER = "root"
+DB_PASS = "Proj@Py19"
 
 sql_database = mysql.connector.connect(
     host = DB_HOST,
