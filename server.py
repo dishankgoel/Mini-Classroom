@@ -2,6 +2,11 @@ import socket
 from threading import Thread
 from http_lib import HttpParser, HttpResponse
 from server_to_app import Handler
+import sys
+
+'''
+Usage: python3 ./server.py <ip>
+'''
 
 class RequestThread(Thread):
 
@@ -24,17 +29,9 @@ class RequestThread(Thread):
 
         http_response = HttpResponse(self.sock)
         http_response.respond(status_code, headers, body)
-        # app = Interface(http_object)
-        # app.handle()
-        
-        # print("Request method: ", http_object.get_method())
-        # print("Request uri: ", http_object.get_uri())
-        # print("Request version: ", http_object.get_version())
-        # print("Headers: ", http_object.get_headers())
-        # print("Body: ", http_object.get_body())
+        self.sock.close()
 
-
-ip = '127.0.0.1'
+ip = sys.argv[1]
 port = 12345
 
 buffer_size = 2048
@@ -44,7 +41,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_sock:
     server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     server_sock.bind((ip, port))
-    print("Server Started on Port: ", port)
+    print("[*] Server Started on Port: ", port)
     while True:
 
         server_sock.listen(5)
