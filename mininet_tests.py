@@ -53,10 +53,10 @@ def perform_tests():
     app_servers = ['h33', 'h34', 'h35', 'h36']
     for app_server in app_servers:
         s = net.get(app_server)
-        p = s.popen('../start_app.sh', s.IP(), stdout = subprocess.PIPE)
+        p = s.popen('./start_app.sh', s.IP(), stdout = subprocess.PIPE)
         output, error = p.communicate()
         print(output, error)
-    time.sleep(10)
+    time.sleep(2)
     instructor = net.get('h1')
     print("[*] Creating Instructor")
     p = instructor.popen("python3", "instructor.py", net.get('h33').IP(), stdout = subprocess.PIPE)
