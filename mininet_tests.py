@@ -16,15 +16,8 @@ class TreeTopo( Topo ):
         # Numbering:  h1..N, s1..M
         self.hostNum = 1
         self.switchNum = 1
-        self.custom_switches = []
         # Build topology
         self.addTree( depth, fanout )
-        hosts_added = 2**depth
-        for i in range(1, 5):
-            added_host = self.addHost('h{}'.format(hosts_added + i))
-            self.addLink(added_host, self.custom_switches[i])
-        database = self.addHost('h37')
-        self.addLink(database, self.custom_switches[0])
 
     def addTree( self, depth, fanout ):
         """Add a subtree starting with node n.
@@ -32,8 +25,6 @@ class TreeTopo( Topo ):
         isSwitch = depth > 0
         if isSwitch:
             node = self.addSwitch( 's%s' % self.switchNum )
-            if(self.switchNum in [1, 3,10,18,25]):
-                self.custom_switches.append(node)
             self.switchNum += 1
             for _ in range( fanout ):
                 child = self.addTree( depth - 1, fanout )
@@ -46,17 +37,18 @@ class TreeTopo( Topo ):
 
 def perform_tests():
 
-    topo = TreeTopo(depth = 5)
+    topo = TreeTopo(depth = 3)
     net = Mininet(topo, link = TCLink)
+    net.addNAT().configDefault()
     net.start()
-    print ("Dumping host connections")
-    dumpNodeConnections(net.hosts)
-    CLI(net)
+    # print ("Dumping host connections")
+    # dumpNodeConnections(net.hosts)
+    # datbase_ip = net.get('nat0').IP()
     # app_servers = ['h33', 'h34']
     # for app_server in app_servers:
     #     s = net.get(app_server)
-    #     p = s.popen('./start_app.sh', s.IP(), stdout = subprocess.PIPE)
-    # time.sleep(10)
+    #     p = s.popen('./start_app.sh', s.IP(), datbase_ip, stdout = subprocess.PIPE)
+    # time.sleep(2)
     # instructor = net.get('h1')
     # print("[*] Creating Instructor")
     # p = instructor.popen("python3", "instructor.py", net.get('h33').IP(), stdout = subprocess.PIPE)
@@ -71,6 +63,7 @@ def perform_tests():
     #     output, error = p.communicate()
     #     print(error)
     #     p.wait()
+    CLI(net)
     net.stop()
 
 
